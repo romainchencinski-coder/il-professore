@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Le contrat à durée indéterminée (CDI) et ses clauses générales</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quelle est la forme normale et générale de la relation de travail ?",
+  "c": [
+   "Le contrat à durée indéterminée (CDI)",
+   "Le contrat d’entreprise",
+   "Le CDD",
+   "L’intérim"
+  ],
+  "a": 0,
+  "e": "Article L1221-2 du Code du travail."
+ },
+ {
+  "q": "Un CDI à temps plein doit-il obligatoirement être écrit ?",
+  "c": [
+   "Oui, sous peine de nullité",
+   "Non, mais l’employeur doit remettre des documents écrits d’information au salarié",
+   "Non, et aucune information n’est due",
+   "Oui, devant notaire"
+  ],
+  "a": 1,
+  "e": "Le CDI à temps partiel, lui, doit être écrit."
+ },
+ {
+  "q": "Quelle est la durée maximale initiale de la période d’essai d’un cadre ?",
+  "c": [
+   "4 mois",
+   "2 mois",
+   "1 an",
+   "1 mois"
+  ],
+  "a": 0,
+  "e": "2 mois pour les employés, 3 mois pour les techniciens."
+ },
+ {
+  "q": "La période d’essai se présume-t-elle ?",
+  "c": [
+   "Oui, pour les cadres",
+   "Oui, si la convention collective existe",
+   "Non, elle doit être prévue dans le contrat ou la lettre d’engagement",
+   "Oui, toujours"
+  ],
+  "a": 2,
+  "e": "Elle ne se présume pas."
+ },
+ {
+  "q": "Combien de fois la période d’essai peut-elle être renouvelée ?",
+  "c": [
+   "Autant que l’employeur le souhaite",
+   "Une fois, si un accord de branche étendu et le contrat le prévoient",
+   "Trois fois",
+   "Jamais"
+  ],
+  "a": 1,
+  "e": "Article L1221-21 du Code du travail."
+ },
+ {
+  "q": "Quelle est la durée légale du travail en France ?",
+  "c": [
+   "39 heures",
+   "48 heures",
+   "40 heures",
+   "35 heures par semaine"
+  ],
+  "a": 3,
+  "e": "Au-delà : heures supplémentaires majorées."
+ },
+ {
+  "q": "Quelle est la durée maximale quotidienne du travail en principe ?",
+  "c": [
+   "10 heures",
+   "12 heures",
+   "14 heures",
+   "8 heures"
+  ],
+  "a": 0,
+  "e": "Et 48 heures par semaine au plus."
+ },
+ {
+  "q": "Combien de jours ouvrables de congés payés acquiert-on par mois de travail ?",
+  "c": [
+   "2,5 jours",
+   "1 jour",
+   "3 jours",
+   "5 jours"
+  ],
+  "a": 0,
+  "e": "Soit 5 semaines par an."
+ },
+ {
+  "q": "L’employeur peut-il muter un salarié dans le même secteur géographique sans clause de mobilité ?",
+  "c": [
+   "Seulement si le salarié est cadre",
+   "Seulement avec l’accord du juge",
+   "Oui, c’est un changement des conditions de travail",
+   "Non, jamais"
+  ],
+  "a": 2,
+  "e": "Au-delà du secteur, accord ou clause nécessaire."
+ },
+ {
+  "q": "Pour vérifier la conformité d’un CDI, à quoi le confronte-t-on ?",
+  "c": [
+   "Au règlement de copropriété",
+   "Au Code du travail, à la convention collective et aux accords d’entreprise",
+   "Aux conditions générales de vente",
+   "Au Code de la route"
+  ],
+  "a": 1,
+  "e": "Capacité attendue du programme."
+ }
+];
+
+const FICHE = "23_le-contrat-a-duree-indeterminee-cdi-et-ses-clauses-generales_fiche.pdf";
+const FDATA = {"title": "Le contrat à durée indéterminée (CDI) et ses clauses générales", "blocks": [["h", "Le CDI, droit commun de la relation de travail", ["« Le contrat de travail à durée indéterminée est la **forme normale et générale** de la relation de travail » (article L1221-2 du Code du travail). Il est conclu **sans terme** : il ne prend fin que par démission, licenciement, rupture conventionnelle, départ ou mise à la retraite, ou force majeure.", "Le CDI à **temps plein** peut être **verbal** (l’écrit est néanmoins recommandé et généralement prévu par la convention collective) ; mais l’employeur doit remettre au salarié un ou plusieurs **documents écrits** précisant les informations principales de la relation de travail (identité des parties, lieu, emploi, date de début, période d’essai, rémunération, durée du travail, congés, convention collective…) dans un délai de 7 jours à 1 mois (obligation issue d’une directive européenne de 2019, applicable depuis novembre 2023). Le CDI à **temps partiel** doit être écrit.", "Pour vérifier la **conformité** d’un CDI, on confronte ses clauses au **Code du travail** (ordre public), à la **convention collective** de branche et aux **accords d’entreprise** applicables."]], ["table", "Les clauses générales", ["Clause", "Règles essentielles"], [["**Période d’essai**", "Permet à l’employeur d’évaluer les compétences du salarié et au salarié d’apprécier le poste ; elle ne se présume pas : elle doit figurer dans le contrat ou la lettre d’engagement. Durée maximale : **2 mois** (ouvriers et employés), **3 mois** (agents de maîtrise et techniciens), **4 mois** (cadres) ; renouvelable **une fois** si un accord de branche étendu le prévoit et si le contrat le stipule (au total 4, 6 ou 8 mois). Rupture libre, sans motif, sous réserve d’un **délai de prévenance** (de 24 heures à 1 mois selon la présence) et de l’absence d’abus"], ["**Lieu de travail**", "Simple information en principe : le salarié peut être muté dans le même **secteur géographique** (même bassin d’emploi) ; au-delà, il faut son accord ou une clause de mobilité"], ["**Horaire et durée du travail**", "Durée légale **35 heures** par semaine ; **heures supplémentaires** majorées (25 % pour les 8 premières, 50 % au-delà, sauf accord) ; durées maximales : **10 heures** par jour, **48 heures** par semaine, 44 heures en moyenne sur 12 semaines ; repos quotidien de **11 heures**, hebdomadaire de **35 heures** ; temps partiel : au moins 24 heures par semaine en principe ; forfaits jours pour certains cadres autonomes (218 jours)"], ["**Rémunération**", "Au moins égale au **SMIC** et aux **minima conventionnels** de la classification ; **égalité de rémunération** femmes-hommes pour un travail de valeur égale ; éléments variables (primes, commissions) définis précisément ; elle ne peut être modifiée sans l’accord du salarié"], ["**Qualification** et **missions**", "Emploi occupé et **classification** conventionnelle (coefficient, niveau, statut cadre ou non) : elle détermine le salaire minimum, la période d’essai, le préavis ; les missions décrivent le poste"], ["**Congés payés**", "**2,5 jours ouvrables** par mois de travail effectif, soit 5 semaines par an ; depuis la loi du 22 avril 2024, les arrêts maladie ouvrent aussi droit à des congés (2 jours ouvrables par mois en cas de maladie non professionnelle)"], ["Convention collective et autres mentions", "Mention de la convention applicable, caisses de retraite complémentaire et de prévoyance, préavis en cas de rupture"]]], ["h", "Avantages et inconvénients du CDI", ["**Pour le salarié** : stabilité, accès au logement et au crédit, protection contre le licenciement (cause réelle et sérieuse, procédure, indemnités), progression de carrière.", "**Pour l’employeur** : fidélisation et formation des compétences, mais **rigidité** relative (procédure de rupture, coût du licenciement) que des clauses spécifiques et d’autres contrats permettent d’adapter."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Le contrat à durée indéterminée (CDI) et ses clauses générales</h1>
+    <p class="sub">Terminale STMG Droit – 7.1 Le CDI et les autres formes de contrat de travail</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Taylorisme et fordisme</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Qui a théorisé l'organisation scientifique du travail (OST) ?",
+  "c": [
+   "Henry Ford",
+   "Karl Marx",
+   "Frederick W. Taylor",
+   "Taiichi Ohno"
+  ],
+  "a": 2,
+  "e": "F. W. Taylor publie « La direction scientifique des entreprises » en 1911 (titre original : The Principles of Scientific Management)."
+ },
+ {
+  "q": "Que signifie la « division verticale » du travail chez Taylor ?",
+  "c": [
+   "Placer les machines sur plusieurs étages",
+   "Séparer conception (ingénieurs) et exécution (ouvriers)",
+   "Payer les ouvriers selon leur ancienneté",
+   "Découper le travail en tâches simples"
+  ],
+  "a": 1,
+  "e": "Division verticale = les ingénieurs conçoivent, les ouvriers exécutent. La division horizontale est la parcellisation des tâches."
+ },
+ {
+  "q": "Comment Taylor détermine-t-il le « one best way » ?",
+  "c": [
+   "Par un vote des ouvriers",
+   "Par la hausse des salaires",
+   "Par l'imitation des concurrents",
+   "Par le chronométrage des gestes"
+  ],
+  "a": 3,
+  "e": "Le chronométrage permet de trouver la méthode la plus efficace pour chaque tâche."
+ },
+ {
+  "q": "Quel système de rémunération est associé au taylorisme ?",
+  "c": [
+   "Le salaire minimum garanti",
+   "Le salaire à l'ancienneté",
+   "La participation aux bénéfices",
+   "Le salaire au rendement"
+  ],
+  "a": 3,
+  "e": "Le salaire au rendement stimule les cadences."
+ },
+ {
+  "q": "Quelle innovation majeure caractérise le fordisme ?",
+  "c": [
+   "Le juste-à-temps",
+   "L'automatisation par robots",
+   "La chaîne de montage mobile",
+   "Le travail à domicile"
+  ],
+  "a": 2,
+  "e": "La chaîne de montage mobile est mise en place à Highland Park en 1913 : le travail vient à l'ouvrier."
+ },
+ {
+  "q": "Quel est le célèbre modèle produit par Ford en grande série ?",
+  "c": [
+   "La 2 CV",
+   "La Ford T",
+   "La Mustang",
+   "La Coccinelle"
+  ],
+  "a": 1,
+  "e": "La Ford T (1908) incarne la standardisation : un modèle unique produit en masse."
+ },
+ {
+  "q": "Pourquoi Ford instaure-t-il le « Five dollars a day » en 1914 ?",
+  "c": [
+   "Pour punir les grévistes",
+   "Parce que la loi l'y oblige",
+   "Pour fidéliser les ouvriers et en faire des consommateurs",
+   "Pour réduire ses coûts de production"
+  ],
+  "a": 2,
+  "e": "Des salaires élevés limitent le turn-over et créent une demande pour les produits fabriqués."
+ },
+ {
+  "q": "Quelle est la bonne suite du cercle vertueux fordiste ?",
+  "c": [
+   "Hausse des salaires → baisse de la productivité → chômage",
+   "Hausse des prix → baisse de la demande → baisse de la production",
+   "Gains de productivité → baisse des prix et hausse des salaires → hausse de la demande → production accrue",
+   "Baisse des salaires → baisse des prix → hausse des profits"
+  ],
+  "a": 2,
+  "e": "Productivité ↗ → prix ↘ et salaires ↗ → demande ↗ → production de masse encore accrue."
+ },
+ {
+  "q": "Quelle différence principale entre taylorisme et fordisme ?",
+  "c": [
+   "Le taylorisme organise le travail, le fordisme est un modèle de production et de consommation de masse",
+   "Il n'y en a aucune",
+   "Le taylorisme est un modèle économique global, le fordisme une méthode de chronométrage",
+   "Le fordisme précède le taylorisme"
+  ],
+  "a": 0,
+  "e": "Le fordisme prolonge le taylorisme en y ajoutant la chaîne, la standardisation et la consommation de masse."
+ },
+ {
+  "q": "Quel type de main-d'œuvre domine dans le système fordiste ?",
+  "c": [
+   "Les artisans indépendants",
+   "Les ouvriers de métier très qualifiés",
+   "Les cadres",
+   "Les ouvriers spécialisés (OS)"
+  ],
+  "a": 3,
+  "e": "Les OS réalisent des tâches répétitives et exigent peu de qualification."
+ },
+ {
+  "q": "Qu'est-ce que le « compromis fordiste » ?",
+  "c": [
+   "Un traité commercial entre États",
+   "Salaires indexés sur la productivité, protection sociale et consommation de masse",
+   "Un accord entre Ford et ses concurrents",
+   "La fusion des syndicats"
+  ],
+  "a": 1,
+  "e": "Il caractérise les Trente Glorieuses en Europe après 1945."
+ },
+ {
+  "q": "Quel film de Chaplin critique le travail à la chaîne ?",
+  "c": [
+   "Le Kid",
+   "Le Dictateur",
+   "La Ruée vers l'or",
+   "Les Temps modernes"
+  ],
+  "a": 3,
+  "e": "« Les Temps modernes » (1936) dénonce l'aliénation du travail à la chaîne."
+ },
+ {
+  "q": "Laquelle de ces propositions est une limite du fordisme ?",
+  "c": [
+   "Une trop grande diversité des produits",
+   "La monotonie, l'aliénation et la rigidité face à une demande diversifiée",
+   "Des salaires trop faibles",
+   "L'absence de standardisation"
+  ],
+  "a": 1,
+  "e": "Travail monotone, absentéisme, conflits sociaux, et production standardisée mal adaptée à la diversification de la demande."
+ },
+ {
+  "q": "Quand le modèle fordiste entre-t-il en crise ?",
+  "c": [
+   "Dans les années 1920",
+   "Dans les années 1970",
+   "Dans les années 1950",
+   "Dans les années 2000"
+  ],
+  "a": 1,
+  "e": "Saturation des marchés, ralentissement de la productivité, chocs pétroliers."
+ },
+ {
+  "q": "Quel modèle succède au fordisme avec le « juste-à-temps » ?",
+  "c": [
+   "Le toyotisme",
+   "Le taylorisme",
+   "Le keynésianisme",
+   "Le colbertisme"
+  ],
+  "a": 0,
+  "e": "Le toyotisme (Ohno) : production à la demande, polyvalence, qualité."
+ }
+];
+
+const FICHE = "46_taylorisme-et-fordisme_fiche.pdf";
+const FDATA = {"title": "Taylorisme et fordisme", "blocks": [["h", "Définitions", ["**Taylorisme** : organisation scientifique du travail (OST) théorisée par [[F. W. Taylor|Frederick_Winslow_Taylor]] (*La direction scientifique des entreprises*, 1911) pour maximiser la productivité à l’usine.", "**Fordisme** : modèle de production et de consommation de masse mis en place par [[Henry Ford|Henry_Ford]] (Ford T, 1908 ; chaîne de montage mobile à Highland Park, 1913), qui prolonge le taylorisme."]], ["h", "Taylorisme : principes", ["**Division horizontale** : le travail est découpé en tâches simples et répétitives (parcellisation).", "**Division verticale** : les ingénieurs conçoivent, les ouvriers exécutent.", "**« One best way »** : une seule méthode optimale, déterminée par le **chronométrage** des gestes.", "**Salaire au rendement** pour stimuler les cadences."]], ["h", "Fordisme : principes", ["**Chaîne de montage** : le travail vient à l’ouvrier, la cadence est imposée par la machine.", "**Standardisation** : un modèle unique (Ford T) produit en grande série.", "**Production de masse** : les coûts baissent grâce aux économies d’échelle, donc le prix aussi.", "**« Five dollars a day » (1914)** : salaires élevés pour fidéliser les ouvriers et en faire des consommateurs."]], ["flow", "Le cercle vertueux fordiste", ["Gains de productivité", "Baisse des prix et hausse des salaires", "Hausse de la demande", "Production de masse accrue"]], ["h", "Contexte historique", ["Se diffuse en Europe après 1945 (Trente Glorieuses) avec le **compromis fordiste** : salaires indexés sur la productivité, protection sociale, consommation de masse.", "Main-d’œuvre : surtout des **ouvriers spécialisés (OS)**, peu qualifiés."]], ["h", "Limites et critiques", ["Travail monotone, **aliénation** (voir *Les Temps modernes*, Chaplin, 1936).", "Absentéisme, turn-over, grèves, conflits sociaux.", "Rigidité : production standardisée mal adaptée à une demande qui se diversifie.", "**Crise dans les années 1970** : saturation des marchés, ralentissement de la productivité, chocs pétroliers."]], ["table", "À retenir", ["", "Taylorisme", "Fordisme"], [["Échelle", "Organisation du travail", "Modèle économique global"], ["Idée clé", "Parcellisation + chronométrage", "Chaîne + production/consommation de masse"], ["Auteur", "F. W. Taylor", "H. Ford"]]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Taylorisme et fordisme</h1>
+    <p class="sub">Terminale SES – Mutations du travail et de l’emploi</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

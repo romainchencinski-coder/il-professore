@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : La responsabilité contractuelle : inexécution, obligation de sécurité et clauses limitatives</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quel article fonde la responsabilité contractuelle ?",
+  "c": [
+   "L’article L411-1",
+   "L’article 1231-1 du Code civil",
+   "L’article 1245",
+   "L’article 1240"
+  ],
+  "a": 1,
+  "e": "Inexécution ou retard, sauf force majeure."
+ },
+ {
+  "q": "Quand applique-t-on la responsabilité contractuelle ?",
+  "c": [
+   "Dès qu’un dommage est grave",
+   "Quand le dommage est écologique",
+   "Quand la victime est un tiers",
+   "Quand le dommage naît de l’exécution d’un contrat valable entre le responsable et la victime"
+  ],
+  "a": 3,
+  "e": "À défaut de régime spécial."
+ },
+ {
+  "q": "Pour une obligation de moyens, que doit prouver le créancier victime ?",
+  "c": [
+   "La force majeure",
+   "Rien du tout",
+   "Une faute du débiteur",
+   "Seulement l’absence de résultat"
+  ],
+  "a": 2,
+  "e": "Imprudence, négligence, manque de diligence."
+ },
+ {
+  "q": "Comment le débiteur d’une obligation de résultat peut-il s’exonérer ?",
+  "c": [
+   "En prouvant qu’il a été diligent",
+   "En prouvant une cause étrangère, comme la force majeure",
+   "En payant une amende",
+   "En invoquant sa bonne foi"
+  ],
+  "a": 1,
+  "e": "Le seul échec suffit à engager sa responsabilité."
+ },
+ {
+  "q": "Quel dommage est réparé en principe en matière contractuelle ?",
+  "c": [
+   "Seulement le dommage écologique",
+   "Le dommage prévisible lors de la conclusion du contrat, sauf faute lourde ou dolosive",
+   "Tous les dommages imaginables",
+   "Seulement le dommage moral"
+  ],
+  "a": 1,
+  "e": "Article 1231-3."
+ },
+ {
+  "q": "Quelle jurisprudence a inspiré l’article 1170 sur l’obligation essentielle ?",
+  "c": [
+   "L’arrêt Erika (2012)",
+   "L’arrêt Chronopost (1996)",
+   "L’arrêt Jand’heur (1930)",
+   "L’arrêt Société générale (1996)"
+  ],
+  "a": 1,
+  "e": "Clause limitant la responsabilité au prix du transport en cas de retard."
+ },
+ {
+  "q": "Une clause limitative de responsabilité entre deux professionnels est en principe…",
+  "c": [
+   "Toujours nulle",
+   "Pénalement sanctionnée",
+   "Réservée aux consommateurs",
+   "Valable"
+  ],
+  "a": 3,
+  "e": "Sauf obligation essentielle, faute lourde ou dolosive."
+ },
+ {
+  "q": "Face à un consommateur, une clause qui supprime son droit à réparation est…",
+  "c": [
+   "Abusive par nature (liste noire)",
+   "Présumée abusive mais prouvable",
+   "Valable si elle est en gras",
+   "Valable si elle est signée"
+  ],
+  "a": 0,
+  "e": "Article R212-1 du Code de la consommation."
+ },
+ {
+  "q": "L’obligation de sécurité du transporteur de personnes est…",
+  "c": [
+   "Inexistante",
+   "Facultative",
+   "De résultat",
+   "De moyens"
+  ],
+  "a": 2,
+  "e": "Le voyageur n’a aucun rôle actif."
+ },
+ {
+  "q": "Pour un client qui pratique l’escalade encadrée, l’obligation de sécurité est en général…",
+  "c": [
+   "Pénale",
+   "De moyens, car il participe activement",
+   "Inexistante",
+   "De résultat"
+  ],
+  "a": 1,
+  "e": "Il doit prouver une faute du professionnel."
+ }
+];
+
+const FICHE = "15_la-responsabilite-contractuelle-inexecution-obligation-de-se_fiche.pdf";
+const FDATA = {"title": "La responsabilité contractuelle : inexécution, obligation de sécurité et clauses limitatives", "blocks": [["h", "Le principe", ["**Article 1231-1 du Code civil** : « Le débiteur est condamné, s’il y a lieu, au paiement de dommages et intérêts soit à raison de l’**inexécution** de l’obligation, soit à raison du **retard** dans l’exécution, s’il ne justifie pas que l’exécution a été empêchée par la **force majeure**. »", "La responsabilité contractuelle s’applique quand le dommage **naît de l’exécution d’un contrat** valable entre le responsable et la victime, et qu’aucun régime spécial ne s’applique. Ce sont alors les **règles du contrat** (expresses ou tacites) qui déterminent les conditions et l’étendue de la responsabilité."]], ["table", "Les conditions", ["Condition", "Contenu"], [["Un **contrat valable** entre les parties", "La victime est le cocontractant (pas un tiers) ; à défaut, responsabilité extracontractuelle"], ["Une **inexécution** (fait générateur)", "Inexécution totale, partielle, tardive ou défectueuse d’une obligation contractuelle ; sa preuve dépend de la nature de l’obligation (voir ci-dessous)"], ["Un **dommage**", "Certain, direct ; en principe seul le dommage **prévisible** lors de la conclusion du contrat est réparé, sauf **faute lourde ou dolosive** (article 1231-3) ; il n’est dû que si le débiteur a été préalablement **mis en demeure** (sauf inexécution définitive, article 1231)"], ["Un **lien de causalité**", "Le dommage est la suite **immédiate et directe** de l’inexécution (article 1231-4)"]]], ["table", "Obligation de moyens ou de résultat : l’impact sur la preuve", ["", "Obligation de moyens", "Obligation de résultat"], [["Ce que le créancier prouve", "Une **faute** du débiteur : il n’a pas mis en œuvre tous les moyens (imprudence, négligence, maladresse)", "Simplement que le **résultat promis n’est pas atteint**"], ["Comment le débiteur s’exonère", "En prouvant qu’il a été diligent", "Seulement par une **cause étrangère** (force majeure, fait du créancier ou d’un tiers présentant ses caractères)"], ["Exemples", "Médecin, avocat, agence de voyage pour les prestations de tiers… ; garagiste pour le diagnostic", "Transporteur (arriver à l’heure, sain et sauf), garagiste pour la réparation demandée, livreur, fabricant"]]], ["h", "L’obligation de sécurité, création du juge", ["Pour mieux indemniser les victimes de dommages corporels survenus pendant l’exécution d’un contrat, le juge a **découvert** une obligation de sécurité dans de nombreux contrats : transport de personnes (arrêt de 1911), restauration, hôtellerie, centres de loisirs, remontées mécaniques, vente (sécurité des produits), contrat de travail.", "Elle est **de résultat** lorsque le créancier n’a aucun rôle actif (passager d’un train ou d’un avion, client d’un manège qu’il ne dirige pas) et **de moyens** lorsqu’il participe activement (pratique d’un sport encadré, auto-tamponneuses, salle d’escalade) : il doit alors prouver la faute du professionnel."]], ["table", "Les clauses limitatives ou exonératoires de responsabilité", ["Situation", "Validité"], [["Principe : entre professionnels", "**Valables** : elles plafonnent l’indemnisation ou excluent certains dommages ; elles répartissent les risques (souvent en échange d’un prix plus bas)"], ["Clause qui prive de sa **substance l’obligation essentielle**", "**Réputée non écrite** (article 1170, consacrant la jurisprudence **Chronopost**, 1996 : le transporteur rapide qui promettait une livraison dans un délai précis ne pouvait limiter sa responsabilité au prix du transport en cas de retard)"], ["**Faute lourde** (négligence d’une extrême gravité) ou **dolosive** (intentionnelle)", "La clause est **écartée** : le débiteur répond de tout le dommage"], ["Contrat avec un **consommateur**", "Clause supprimant ou réduisant le droit à réparation du consommateur en cas de manquement du professionnel : **abusive par nature** (liste noire, article R212-1 6° du Code de la consommation)"], ["**Dommage corporel**", "La jurisprudence refuse en pratique de limiter la réparation des atteintes à la personne (et le projet de réforme le prévoit)"]]], ["h", "Exemple", ["Un traiteur livre un buffet de mariage avec trois heures de retard, les invités sont partis. Contrat de prestation entre les mariés (créanciers) et le traiteur (débiteur). L’obligation de livrer à l’heure est **de résultat** : le retard suffit à engager sa responsabilité, sauf force majeure. Une clause limitant la réparation au prix du repas serait réputée non écrite (obligation essentielle ; contrat avec des consommateurs)."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : La responsabilité contractuelle : inexécution, obligation de sécurité et clauses limitatives</h1>
+    <p class="sub">Terminale STMG Droit – 6.2 Les régimes de responsabilité (2) : responsabilité contractuelle et extracontractuelle</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

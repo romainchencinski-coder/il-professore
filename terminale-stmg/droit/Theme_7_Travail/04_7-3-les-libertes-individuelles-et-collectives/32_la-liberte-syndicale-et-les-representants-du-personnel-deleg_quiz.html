@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : La liberté syndicale et les représentants du personnel : délégué syndical et comité social et économique (CSE)</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quelle loi a reconnu la liberté syndicale en France ?",
+  "c": [
+   "La loi Le Chapelier de 1791",
+   "La loi Ollivier de 1864",
+   "La loi Badinter de 1985",
+   "La loi Waldeck-Rousseau du 21 mars 1884"
+  ],
+  "a": 3,
+  "e": "Confirmée par le Préambule de 1946."
+ },
+ {
+  "q": "La liberté syndicale comprend-elle le droit de ne pas adhérer à un syndicat ?",
+  "c": [
+   "Non, l’adhésion est obligatoire",
+   "Seulement pour les cadres",
+   "Oui",
+   "Seulement dans les PME"
+  ],
+  "a": 2,
+  "e": "Liberté positive et négative."
+ },
+ {
+  "q": "Quelle audience électorale un syndicat doit-il obtenir pour être représentatif dans l’entreprise ?",
+  "c": [
+   "Au moins 1 %",
+   "Au moins 10 % des suffrages au premier tour des élections du CSE",
+   "Aucune",
+   "Au moins 50 %"
+  ],
+  "a": 1,
+  "e": "Loi du 20 août 2008."
+ },
+ {
+  "q": "À partir de quel effectif un délégué syndical peut-il être désigné ?",
+  "c": [
+   "50 salariés",
+   "1 000 salariés",
+   "11 salariés",
+   "300 salariés"
+  ],
+  "a": 0,
+  "e": "Entre 11 et 49, un élu du CSE peut être désigné."
+ },
+ {
+  "q": "Quelle est la mission principale du délégué syndical ?",
+  "c": [
+   "Diriger l’entreprise",
+   "Juger les litiges",
+   "Négocier et signer les accords d’entreprise",
+   "Gérer les activités sociales et culturelles"
+  ],
+  "a": 2,
+  "e": "Il représente son syndicat."
+ },
+ {
+  "q": "À partir de quel effectif le CSE doit-il être mis en place ?",
+  "c": [
+   "11 salariés pendant 12 mois consécutifs",
+   "5 salariés",
+   "300 salariés",
+   "50 salariés"
+  ],
+  "a": 0,
+  "e": "Ordonnances de 2017."
+ },
+ {
+  "q": "Pour combien de temps les membres du CSE sont-ils élus ?",
+  "c": [
+   "1 an",
+   "2 ans",
+   "10 ans",
+   "4 ans"
+  ],
+  "a": 3,
+  "e": "Sauf accord prévoyant une durée plus courte."
+ },
+ {
+  "q": "Quelle attribution du CSE existe dès 11 salariés ?",
+  "c": [
+   "Signer les accords d’entreprise",
+   "Fixer les salaires",
+   "Gérer un budget d’activités sociales et culturelles",
+   "Présenter les réclamations des salariés et exercer un droit d’alerte en cas de danger grave et imminent"
+  ],
+  "a": 3,
+  "e": "Les attributions économiques viennent à 50 salariés."
+ },
+ {
+  "q": "Qui doit autoriser le licenciement d’un délégué syndical ou d’un élu du CSE ?",
+  "c": [
+   "Le maire",
+   "Personne",
+   "L’inspecteur du travail",
+   "Le CSE lui-même"
+  ],
+  "a": 2,
+  "e": "Statut de salarié protégé."
+ },
+ {
+  "q": "Comment appelle-t-on l’infraction de l’employeur qui empêche le fonctionnement des représentants du personnel ?",
+  "c": [
+   "Le délit d’entrave",
+   "L’abus de droit",
+   "La concurrence déloyale",
+   "La rupture brutale"
+  ],
+  "a": 0,
+  "e": "Sanction pénale."
+ }
+];
+
+const FICHE = "32_la-liberte-syndicale-et-les-representants-du-personnel-deleg_fiche.pdf";
+const FDATA = {"title": "La liberté syndicale et les représentants du personnel : délégué syndical et comité social et économique (CSE)", "blocks": [["h", "La liberté syndicale", ["Reconnue par la **loi Waldeck-Rousseau du 21 mars 1884** et le **Préambule de 1946** (alinéa 6 : « Tout homme peut défendre ses droits et ses intérêts par l’action syndicale et adhérer au syndicat de son choix »).", "Elle comprend la liberté **d’adhérer** ou **de ne pas adhérer** à un syndicat et d’en sortir, la liberté de **créer** un syndicat, d’y exercer des responsabilités, et l’interdiction de toute **discrimination syndicale** (embauche, salaire, promotion, sanction : article L2141-5).", "Les syndicats ont pour objet l’étude et la **défense des droits et des intérêts** matériels et moraux, collectifs et individuels, des personnes qu’ils représentent ; ils agissent en justice, négocient, présentent des candidats.", "**Représentativité** (loi du 20 août 2008) : critères de respect des valeurs républicaines, indépendance, transparence financière, ancienneté d’au moins 2 ans, influence, effectifs, et surtout **audience électorale** : au moins **10 %** des suffrages au premier tour des élections du CSE dans l’entreprise (8 % au niveau de la branche ou national). Seuls les syndicats représentatifs négocient et signent les accords."]], ["table", "Distinguer les deux représentations", ["", "Délégué syndical (DS)", "Comité social et économique (CSE)"], [["Nature", "Représentation **syndicale** : il représente son syndicat auprès de l’employeur", "Représentation **élue** du personnel (instance unique créée par les ordonnances de 2017, généralisée au 1er janvier 2020)"], ["Mise en place", "Entreprises d’au moins **50 salariés** ; **désigné** par un syndicat représentatif parmi les candidats ayant obtenu au moins 10 % des voix aux élections (dans les entreprises de 11 à 49 salariés, un élu du CSE peut être désigné)", "Entreprises d’au moins **11 salariés** pendant 12 mois consécutifs ; membres **élus** par les salariés pour **4 ans** (premier tour réservé aux listes syndicales), au plus 3 mandats successifs en principe"], ["Missions essentielles", "**Négocier et signer** les accords d’entreprise (négociations obligatoires : salaires, durée du travail, égalité professionnelle, qualité de vie au travail) ; porter les revendications ; animer la section syndicale", "Assurer l’**expression collective** des salariés ; présenter les **réclamations** individuelles et collectives ; promouvoir la **santé, la sécurité** et les conditions de travail ; exercer des **droits d’alerte** ; être informé et **consulté** sur l’organisation et la marche générale de l’entreprise"], ["Protection", "**Salarié protégé** : licenciement soumis à l’autorisation de l’**inspecteur du travail**", "**Salariés protégés** (élus et candidats) : même protection"]]], ["table", "Les attributions du CSE selon l’effectif", ["Effectif", "Attributions"], [["De 11 à 49 salariés", "Réclamations relatives aux salaires et à l’application du Code du travail et des conventions ; santé, sécurité, conditions de travail (enquêtes après accident) ; saisine de l’**inspection du travail** ; **droit d’alerte** en cas d’atteinte aux droits des personnes ou de **danger grave et imminent**"], ["50 salariés et plus", "En plus : **personnalité civile** et budget ; **information-consultation** sur les orientations stratégiques, la situation économique et financière, la politique sociale (et projets importants : licenciements, réorganisation, règlement intérieur, vidéosurveillance) ; **activités sociales et culturelles** (chèques-vacances, culture, sport) ; droit d’alerte **économique** ; recours à des **experts** ; commission santé, sécurité et conditions de travail obligatoire à partir de 300 salariés"]]], ["h", "Moyens et rôle", ["Les représentants disposent d’**heures de délégation** rémunérées, de la liberté de circulation, d’un local, de panneaux d’affichage. Le **délit d’entrave** sanctionne l’employeur qui empêche leur fonctionnement.", "Ensemble, syndicats et élus rendent effectives les **libertés collectives** (expression, négociation, grève) et participent au **dialogue social**, contrepartie du pouvoir de l’employeur."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : La liberté syndicale et les représentants du personnel : délégué syndical et comité social et économique (CSE)</h1>
+    <p class="sub">Terminale STMG Droit – 7.3 Les libertés individuelles et collectives</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

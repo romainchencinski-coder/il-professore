@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Les autres formes de contrat de travail : CDD, CDI de chantier, contrat saisonnier, travail temporaire</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Un CDD peut-il pourvoir durablement un emploi lié à l’activité normale et permanente de l’entreprise ?",
+  "c": [
+   "Non, jamais",
+   "Oui, dans les grandes entreprises",
+   "Oui, avec l’accord du salarié",
+   "Oui, s’il est renouvelé"
+  ],
+  "a": 0,
+  "e": "Article L1242-1 du Code du travail."
+ },
+ {
+  "q": "Quel est un cas de recours autorisé au CDD ?",
+  "c": [
+   "Le remplacement d’un salarié absent",
+   "La réduction des charges sociales",
+   "Le pourvoi d’un poste permanent",
+   "Le remplacement d’un salarié gréviste"
+  ],
+  "a": 0,
+  "e": "Cas limitativement énumérés."
+ },
+ {
+  "q": "Quelle est la durée maximale d’un CDD en principe, renouvellements compris ?",
+  "c": [
+   "6 mois",
+   "3 ans",
+   "18 mois",
+   "5 ans"
+  ],
+  "a": 2,
+  "e": "9 ou 24 mois dans certains cas."
+ },
+ {
+  "q": "Quel est le montant de l’indemnité de fin de contrat d’un CDD ?",
+  "c": [
+   "Un mois de salaire forfaitaire",
+   "25 %",
+   "5 %",
+   "10 % de la rémunération brute totale"
+  ],
+  "a": 3,
+  "e": "Dite prime de précarité."
+ },
+ {
+  "q": "Quelle est la sanction d’un CDD sans écrit précisant son motif ?",
+  "c": [
+   "Une simple amende du salarié",
+   "La nullité du salaire",
+   "Aucune sanction",
+   "La requalification en CDI"
+  ],
+  "a": 3,
+  "e": "Prononcée par le conseil de prud’hommes."
+ },
+ {
+  "q": "Comment prend fin un CDI de chantier ?",
+  "c": [
+   "Par une rupture conventionnelle collective",
+   "Automatiquement sans indemnité",
+   "Par une démission obligatoire",
+   "Par un licenciement pour motif personnel à la fin du chantier, avec préavis et indemnité"
+  ],
+  "a": 3,
+  "e": "Article L1223-8 du Code du travail."
+ },
+ {
+  "q": "Que faut-il pour recourir au CDI de chantier hors BTP ?",
+  "c": [
+   "Un accord de branche étendu qui le prévoit",
+   "L’accord du maire",
+   "Un décret individuel",
+   "Un simple courrier au salarié"
+  ],
+  "a": 0,
+  "e": "Ordonnances de 2017."
+ },
+ {
+  "q": "Le salarié en contrat saisonnier perçoit-il en principe la prime de précarité ?",
+  "c": [
+   "Oui, toujours 10 %",
+   "Seulement s’il est cadre",
+   "Non, sauf accord plus favorable",
+   "Oui, 20 %"
+  ],
+  "a": 2,
+  "e": "Les tâches se répètent chaque année."
+ },
+ {
+  "q": "Qui est l’employeur de l’intérimaire ?",
+  "c": [
+   "L’entreprise utilisatrice",
+   "L’entreprise de travail temporaire",
+   "Le client final",
+   "France Travail"
+  ],
+  "a": 1,
+  "e": "Relation triangulaire."
+ },
+ {
+  "q": "Quels contrats lient l’entreprise de travail temporaire ?",
+  "c": [
+   "Un contrat de mise à disposition avec l’utilisateur et un contrat de mission avec l’intérimaire",
+   "Un contrat de franchise",
+   "Un seul contrat de vente",
+   "Un contrat de société"
+  ],
+  "a": 0,
+  "e": "L’utilisateur répond des conditions de travail."
+ }
+];
+
+const FICHE = "25_les-autres-formes-de-contrat-de-travail-cdd-cdi-de-chantier-_fiche.pdf";
+const FDATA = {"title": "Les autres formes de contrat de travail : CDD, CDI de chantier, contrat saisonnier, travail temporaire", "blocks": [["h", "Des contrats adaptés au cycle économique", ["Ces contrats permettent d’ajuster la main-d’œuvre aux **variations d’activité** (pic saisonnier, absence d’un salarié, chantier). Parce qu’ils sont **précaires**, le législateur les **encadre strictement** : ils ne peuvent servir à pourvoir durablement un emploi lié à l’activité normale et permanente de l’entreprise."]], ["table", "Le contrat à durée déterminée (CDD)", ["Aspect", "Règles (articles L1242-1 et suivants)"], [["**Cas de recours** limitatifs", "**Remplacement** d’un salarié absent, **accroissement temporaire** de l’activité, emplois **saisonniers** ou d’**usage** (spectacle, hôtellerie…), CDD à objet défini pour ingénieurs et cadres, contrats aidés"], ["Forme", "**Écrit obligatoire** mentionnant le **motif** précis, transmis au plus tard dans les 2 jours ouvrables suivant l’embauche ; sinon requalification possible en CDI"], ["Durée", "Terme précis ou imprécis (remplacement) ; **18 mois** maximum renouvellements compris en principe (9 ou 24 mois dans certains cas) ; **2 renouvellements** au plus, sauf accord de branche"], ["Délai de carence", "Entre deux CDD sur le même poste : un tiers de la durée du contrat précédent (moitié si moins de 14 jours), sauf exceptions"], ["Fin et rupture", "Le CDD cesse à son **terme** ; rupture anticipée seulement par accord, **faute grave**, force majeure, inaptitude ou embauche du salarié en CDI ailleurs"], ["**Indemnité de fin de contrat** (prime de précarité)", "**10 %** de la rémunération brute totale (sauf CDD saisonnier, d’usage, jeunes pendant les vacances scolaires, embauche en CDI à l’issue, refus d’un CDI pour le même emploi) + indemnité compensatrice de congés payés"], ["Sanction", "**Requalification en CDI** par le conseil de prud’hommes (indemnité d’au moins un mois de salaire) ; sanctions pénales pour l’employeur"]]], ["table", "Les autres contrats", ["Contrat", "Caractéristiques", "Avantages / inconvénients"], [["**CDI de chantier ou d’opération** (ordonnances de 2017, article L1223-8)", "CDI conclu pour la durée d’un chantier ou d’une opération, possible si un **accord de branche étendu** le prévoit (ou par usage dans le BTP) ; à la fin du chantier, rupture par un **licenciement pour motif personnel** reposant sur cette cause réelle et sérieuse, avec préavis et indemnité", "Employeur : souplesse sans les limites du CDD (durée, renouvellements, prime de précarité). Salarié : statut de CDI et indemnité de licenciement, mais durée incertaine"], ["**Contrat saisonnier**", "CDD pour des tâches appelées à se **répéter chaque année** à des dates à peu près fixes, en fonction des saisons ou des modes de vie collectifs (tourisme, vendanges, stations de ski) ; peut comporter une **clause de reconduction** ; ancienneté cumulée d’une saison à l’autre", "Employeur : main-d’œuvre adaptée au pic, **pas de prime de précarité** en principe. Salarié : revenu limité à la saison, précarité"], ["**Contrat de travail temporaire** (intérim)", "Relation **triangulaire** : l’**entreprise de travail temporaire** (ETT, employeur) conclut un **contrat de mise à disposition** avec l’**entreprise utilisatrice** et un **contrat de mission** avec l’intérimaire ; mêmes cas de recours et durées que le CDD ; rémunération au moins égale à celle d’un salarié de qualification équivalente de l’entreprise utilisatrice ; **indemnité de fin de mission** de 10 % ; l’entreprise utilisatrice est responsable des conditions de travail (sécurité, durée)", "Entreprise utilisatrice : souplesse, recrutement délégué. Intérimaire : expériences variées, primes, mais instabilité ; existence d’un **CDI intérimaire**"]]], ["h", "Interdictions communes", ["On ne peut recourir au CDD ou à l’intérim pour **remplacer un salarié gréviste**, pour effectuer des **travaux particulièrement dangereux** figurant sur une liste, ni (sauf exceptions) dans les 6 mois suivant un **licenciement économique** sur le poste concerné pour accroissement d’activité.", "Les salariés en CDD et intérimaires ont les **mêmes droits** que les salariés permanents (principe d’égalité de traitement) : rémunération, équipements collectifs, sécurité."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Les autres formes de contrat de travail : CDD, CDI de chantier, contrat saisonnier, travail temporaire</h1>
+    <p class="sub">Terminale STMG Droit – 7.1 Le CDI et les autres formes de contrat de travail</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

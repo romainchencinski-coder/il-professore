@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Exécuter le contrat et réagir à l’inexécution : mise en demeure, exception d’inexécution, exécution forcée, réduction du prix</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quel article énumère les sanctions de l’inexécution du contrat ?",
+  "c": [
+   "L’article L221-18",
+   "L’article 1101",
+   "L’article 1240",
+   "L’article 1217 du Code civil"
+  ],
+  "a": 3,
+  "e": "Exception, exécution forcée, réduction du prix, résolution, réparation."
+ },
+ {
+  "q": "Quel est le rôle de la mise en demeure ?",
+  "c": [
+   "Fixer le prix",
+   "Interpeller officiellement le débiteur pour qu’il exécute et constater son retard",
+   "Annuler le contrat",
+   "Condamner le débiteur"
+  ],
+  "a": 1,
+  "e": "Article 1344 du Code civil."
+ },
+ {
+  "q": "Sous quelle forme peut se faire une mise en demeure ?",
+  "c": [
+   "Sommation, lettre recommandée avec accusé de réception ou tout acte d’interpellation suffisant",
+   "Uniquement oralement",
+   "Uniquement par jugement",
+   "Uniquement par SMS"
+  ],
+  "a": 0,
+  "e": "Le recommandé avec accusé de réception est le plus courant."
+ },
+ {
+  "q": "L’exception d’inexécution est propre aux contrats…",
+  "c": [
+   "Solennels uniquement",
+   "Synallagmatiques",
+   "Unilatéraux",
+   "Gratuits"
+  ],
+  "a": 1,
+  "e": "Chaque partie est créancière et débitrice."
+ },
+ {
+  "q": "À quelle condition peut-on opposer l’exception d’inexécution ?",
+  "c": [
+   "Il faut un retard de plus d’un an",
+   "Il faut l’accord du juge préalable",
+   "L’inexécution de l’autre partie doit être suffisamment grave",
+   "Il faut avoir payé la totalité du prix"
+  ],
+  "a": 2,
+  "e": "Article 1219."
+ },
+ {
+  "q": "Quand l’exécution forcée en nature est-elle exclue ?",
+  "c": [
+   "En cas d’impossibilité ou de disproportion manifeste entre son coût et son intérêt",
+   "Quand le créancier est un consommateur",
+   "Quand le contrat est écrit",
+   "Quand le débiteur refuse"
+  ],
+  "a": 0,
+  "e": "Article 1221."
+ },
+ {
+  "q": "En cas d’exécution imparfaite acceptée, quelle sanction le créancier peut-il choisir ?",
+  "c": [
+   "La nullité",
+   "La clause pénale obligatoire",
+   "La rétractation",
+   "La réduction du prix"
+  ],
+  "a": 3,
+  "e": "Article 1223 du Code civil."
+ },
+ {
+  "q": "Les sanctions de l’inexécution peuvent-elles être cumulées ?",
+  "c": [
+   "Oui, si elles ne sont pas incompatibles, et des dommages et intérêts peuvent toujours s’y ajouter",
+   "Non, jamais",
+   "Seulement entre professionnels",
+   "Oui, toutes sans limite"
+  ],
+  "a": 0,
+  "e": "Article 1217 alinéa 2."
+ },
+ {
+  "q": "Que se passe-t-il en cas d’empêchement temporaire dû à la force majeure ?",
+  "c": [
+   "Le débiteur doit des dommages et intérêts",
+   "Le créancier peut réduire le prix de moitié",
+   "Le contrat est nul",
+   "L’exécution est suspendue"
+  ],
+  "a": 3,
+  "e": "Article 1218."
+ },
+ {
+  "q": "Quel article permet la renégociation en cas de changement imprévisible rendant l’exécution excessivement onéreuse ?",
+  "c": [
+   "L’article 1171",
+   "L’article 1195 (imprévision)",
+   "L’article 1832",
+   "L’article 1244"
+  ],
+  "a": 1,
+  "e": "Introduit par la réforme de 2016."
+ }
+];
+
+const FICHE = "07_executer-le-contrat-et-reagir-a-linexecution-mise-en-demeure_fiche.pdf";
+const FDATA = {"title": "Exécuter le contrat et réagir à l’inexécution : mise en demeure, exception d’inexécution, exécution forcée, réduction du prix", "blocks": [["h", "Le principe : exécuter ce qui a été promis", ["Le contrat légalement formé a **force obligatoire** (article 1103) : chaque partie doit exécuter ses obligations **telles qu’elles ont été prévues** (quantité, qualité, délai, lieu), et **de bonne foi** (article 1104).", "L’**inexécution** peut être **totale** (rien n’est livré), **partielle** (une partie de la commande), **tardive** (retard) ou **imparfaite** (bien non conforme, travail mal fait).", "Deux événements peuvent libérer ou adapter l’exécution : la **force majeure** (article 1218 : événement échappant au contrôle du débiteur, imprévisible lors de la conclusion, dont les effets ne peuvent être évités ; empêchement temporaire : exécution suspendue ; définitif : contrat résolu de plein droit) et l’**imprévision** (article 1195 : renégociation puis, à défaut, révision ou fin du contrat par le juge)."]], ["h", "L’éventail des sanctions (article 1217 du Code civil)", ["La partie envers laquelle l’engagement n’a pas été exécuté, ou l’a été imparfaitement, peut : **refuser d’exécuter ou suspendre** sa propre obligation (exception d’inexécution) ; **poursuivre l’exécution forcée en nature** ; obtenir une **réduction du prix** ; provoquer la **résolution** du contrat ; demander **réparation** des conséquences de l’inexécution (dommages et intérêts).", "Les sanctions **non incompatibles** peuvent être **cumulées** ; des dommages et intérêts peuvent toujours s’y ajouter (thème 6 : responsabilité contractuelle).", "Le créancier **choisit** la sanction adaptée : l’objectif est de préserver l’opération économique quand c’est possible, ou d’en sortir quand elle a perdu son intérêt."]], ["h", "La mise en demeure : une étape préalable", ["**Définition** (article 1344) : acte par lequel le créancier **interpelle** le débiteur pour qu’il exécute ; elle constate officiellement le retard. Forme : **sommation** (par commissaire de justice), **lettre recommandée avec accusé de réception** ou tout acte portant interpellation suffisante ; elle peut résulter de la seule exigibilité de l’obligation si le contrat le prévoit.", "Elle est le plus souvent **nécessaire** avant d’exiger l’exécution en nature, la réduction du prix, la résolution par notification ou des dommages et intérêts (article 1231) — elle est requise **lorsque l’exécution reste possible**. Elle fait courir les intérêts de retard sur une somme d’argent (article 1344-1).", "Elle n’est pas utile lorsque l’inexécution est **définitive** (exécution devenue impossible)."]], ["table", "Les sanctions qui maintiennent le contrat", ["Sanction", "Conditions", "Exemple"], [["**Exception d’inexécution** (articles 1219 et 1220)", "Propre aux contrats **synallagmatiques** : une partie peut refuser d’exécuter sa propre obligation si l’autre n’exécute pas la sienne et si cette inexécution est **suffisamment grave** ; par anticipation, elle peut suspendre son exécution s’il est manifeste que l’autre n’exécutera pas, en notifiant sa décision au plus tôt", "Un client refuse de payer le solde tant que le meuble commandé n’est pas livré"], ["**Exécution forcée en nature** (article 1221)", "Après mise en demeure ; impossible si l’exécution est impossible ou s’il existe une **disproportion manifeste** entre son coût pour le débiteur de bonne foi et son intérêt pour le créancier ; le créancier peut aussi **faire exécuter par un tiers** aux frais du débiteur (article 1222)", "Obtenir sous astreinte la livraison du bien acheté"], ["**Réduction du prix** (article 1223)", "En cas d’exécution **imparfaite**, après mise en demeure : le créancier peut accepter l’exécution imparfaite et notifier une réduction proportionnelle du prix", "Une peinture livrée avec défauts mineurs : prix diminué"]]], ["h", "Exemple d’analyse", ["Une boutique en ligne n’a pas livré un ordinateur payé à la commande. Qualification : contrat de vente à distance, synallagmatique, entre un consommateur créancier de la livraison et un professionnel débiteur. Le vendeur répond de plein droit de la bonne exécution. Après une mise en demeure par lettre recommandée restée sans effet, le client peut exiger la livraison ou résoudre le contrat et être remboursé (dans les 14 jours), avec d’éventuels dommages et intérêts."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Exécuter le contrat et réagir à l’inexécution : mise en demeure, exception d’inexécution, exécution forcée, réduction du prix</h1>
+    <p class="sub">Terminale STMG Droit – 5.2 L’exécution du contrat</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Le contenu du contrat : obligations des parties et clauses</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quelle obligation pèse sur un médecin à l’égard de son patient ?",
+  "c": [
+   "Une obligation de donner",
+   "Aucune obligation",
+   "Une obligation de moyens",
+   "Une obligation de résultat"
+  ],
+  "a": 2,
+  "e": "Il doit soigner avec diligence, sans garantir la guérison."
+ },
+ {
+  "q": "Le transporteur de personnes doit conduire le voyageur sain et sauf : quelle obligation ?",
+  "c": [
+   "Une obligation de sécurité de résultat",
+   "Une simple obligation morale",
+   "Une obligation de moyens",
+   "Une obligation de ne pas faire"
+  ],
+  "a": 0,
+  "e": "Jurisprudence depuis 1911."
+ },
+ {
+  "q": "En cas d’obligation de résultat non atteint, que doit prouver le créancier ?",
+  "c": [
+   "La force majeure",
+   "L’intention de nuire",
+   "La faute du débiteur",
+   "Seulement que le résultat n’a pas été atteint"
+  ],
+  "a": 3,
+  "e": "Le débiteur ne s’exonère que par la force majeure."
+ },
+ {
+  "q": "Que permet une clause de réserve de propriété ?",
+  "c": [
+   "Au vendeur de rester propriétaire jusqu’au paiement complet",
+   "À l’acheteur de payer plus tard sans limite",
+   "D’interdire la revente du bien",
+   "De fixer une pénalité de retard"
+  ],
+  "a": 0,
+  "e": "Garantie contre l’impayé."
+ },
+ {
+  "q": "Une clause qui prive de sa substance l’obligation essentielle du débiteur est…",
+  "c": [
+   "Réputée non écrite",
+   "Valable",
+   "Transformée en clause pénale",
+   "Toujours nulle avec tout le contrat"
+  ],
+  "a": 0,
+  "e": "Article 1170 du Code civil."
+ },
+ {
+  "q": "Que fixe une clause pénale ?",
+  "c": [
+   "Le montant forfaitaire des dommages et intérêts en cas d’inexécution",
+   "Le tribunal compétent",
+   "Le prix de vente",
+   "Une peine de prison"
+  ],
+  "a": 0,
+  "e": "Article 1231-5 du Code civil."
+ },
+ {
+  "q": "Qui peut imposer une obligation de sécurité dans un contrat ?",
+  "c": [
+   "La loi ou le juge",
+   "Seulement les parties",
+   "Seulement le notaire",
+   "Seulement le consommateur"
+  ],
+  "a": 0,
+  "e": "Ex. : article L4121-1 du Code du travail."
+ },
+ {
+  "q": "Quand des conditions générales sont-elles opposables ?",
+  "c": [
+   "Si l’autre partie en a eu connaissance et les a acceptées",
+   "Jamais",
+   "Seulement si elles sont imprimées en gras",
+   "Toujours"
+  ],
+  "a": 0,
+  "e": "Article 1119 du Code civil."
+ },
+ {
+  "q": "S’engager à ne pas divulguer des informations, c’est une obligation…",
+  "c": [
+   "De ne pas faire",
+   "De donner",
+   "De moyens de soigner",
+   "De résultat de livraison"
+  ],
+  "a": 0,
+  "e": "Clause de confidentialité."
+ },
+ {
+  "q": "Pourquoi les parties insèrent-elles des clauses particulières ?",
+  "c": [
+   "Pour anticiper les risques et sécuriser leur relation",
+   "Pour échapper à toute loi",
+   "Pour rendre le contrat secret",
+   "Pour éviter de payer des impôts"
+  ],
+  "a": 0,
+  "e": "Impératif de prévision et de sécurité juridique."
+ }
+];
+
+const FICHE = "06_le-contenu-du-contrat-obligations-des-parties-et-clauses_fiche.pdf";
+const FDATA = {"title": "Le contenu du contrat : obligations des parties et clauses", "blocks": [["h", "Les obligations nées du contrat", ["Les obligations peuvent être **choisies par les parties** (livrer tel bien à telle date), **imposées par la loi** (obligation de délivrance conforme et de garantie du vendeur, obligation de sécurité) ou **dégagées par le juge** (obligation d’exécuter de bonne foi, de coopérer, de sécurité).", "Classement par objet : obligation de **donner** (transférer la propriété), de **faire** (réaliser un travail), de **ne pas faire** (ne pas concurrencer, ne pas divulguer).", "Exemples dans la **vente** : le vendeur doit délivrer la chose conforme et la garantir (vices cachés, éviction, conformité) ; l’acheteur doit payer le prix et prendre livraison. Dans le **bail** : le bailleur délivre un logement décent et assure la jouissance paisible ; le locataire paie le loyer et entretient."]], ["table", "Obligation de moyens ou de résultat : une distinction essentielle", ["", "Obligation de moyens", "Obligation de résultat"], [["Contenu", "Le débiteur s’engage à **tout mettre en œuvre** (prudence, diligence) pour atteindre un objectif, sans le garantir", "Le débiteur s’engage à **atteindre un résultat précis**"], ["Exemples", "Médecin (soigner, non guérir), avocat (défendre, non gagner), moniteur de ski, enseignant de soutien", "Transporteur de personnes (arriver sain et sauf), livraison à une date, réparation d’une panne précise, fabricant"], ["Preuve en cas d’échec", "Le **créancier** doit prouver que le débiteur a commis une faute (négligence, imprudence)", "Le seul fait que le résultat ne soit pas atteint suffit : le débiteur est responsable sauf **force majeure**"], ["Critères du juge", "Aléa important, rôle actif du créancier", "Faible aléa, créancier passif, maîtrise de la prestation par le débiteur"]]], ["h", "L’obligation de sécurité", ["Le juge a ajouté à certains contrats une **obligation de sécurité** : le débiteur doit veiller à la sécurité physique de son cocontractant (transporteur depuis 1911, exploitants de manèges, restaurateurs, organisateurs de voyages, vendeurs professionnels, employeur envers ses salariés : article L4121-1 du Code du travail).", "Elle est **de résultat** quand le créancier est passif (voyageur transporté), **de moyens** quand il a un rôle actif (client d’un télésiège pendant l’embarquement, usager d’une salle de sport). Elle permet d’indemniser la victime (thème 6)."]], ["table", "Les principales clauses", ["Clause", "Rôle"], [["Clause de **réserve de propriété**", "Le vendeur reste propriétaire jusqu’au paiement complet du prix : il peut reprendre le bien en cas d’impayé"], ["Clause d’**exclusivité**", "Une partie s’engage à ne contracter qu’avec l’autre (approvisionnement, distribution sur un territoire)"], ["Clause de **non-concurrence** / de **confidentialité**", "Interdire l’exercice d’une activité concurrente / la divulgation d’informations (limitée dans le temps et l’espace pour être valable)"], ["**Clause résolutoire**", "Prévoit la résolution automatique du contrat en cas d’inexécution désignée (voir 5.2)"], ["**Clause pénale**", "Fixe à l’avance et forfaitairement le montant des dommages et intérêts en cas d’inexécution (voir 5.2)"], ["Clause **limitative ou exonératoire de responsabilité**", "Plafonne ou exclut l’indemnisation due en cas d’inexécution ; sans effet si elle prive de sa substance l’**obligation essentielle** (article 1170), en cas de faute lourde ou dolosive, et interdite face à un consommateur (thème 6)"], ["Clause de **médiation** / attributive de juridiction / d’arbitrage", "Organise le règlement des litiges (médiation préalable, tribunal compétent entre commerçants, arbitre)"], ["Clause d’**indexation**, de **révision** ou de **hardship**", "Adapte le prix ou impose une renégociation en cas de changement de circonstances"]]], ["h", "Pourquoi des clauses ?", ["Les clauses particulières répondent aux **besoins spécifiques** des parties et à un impératif de **prévision** et de **sécurité juridique** : anticiper les risques (impayé, retard, litige, changement de prix).", "Leur validité suppose le respect de l’**ordre public** : certaines sont interdites ou encadrées (clauses abusives, clauses privant de substance l’obligation essentielle, non-concurrence excessive). Les **conditions générales** ne sont opposables que si l’autre partie en a eu connaissance et les a acceptées (article 1119)."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Le contenu du contrat : obligations des parties et clauses</h1>
+    <p class="sub">Terminale STMG Droit – 5.1 La formation du contrat</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

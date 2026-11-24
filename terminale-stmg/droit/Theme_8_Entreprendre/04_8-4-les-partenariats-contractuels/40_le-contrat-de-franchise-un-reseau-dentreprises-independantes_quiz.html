@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Le contrat de franchise : un réseau d’entreprises indépendantes</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Que met le franchiseur à la disposition du franchisé ?",
+  "c": [
+   "Son capital social",
+   "Ses salariés",
+   "Son siège social",
+   "Sa marque, son savoir-faire et une assistance"
+  ],
+  "a": 3,
+  "e": "Contre une rémunération."
+ },
+ {
+  "q": "Comment est rémunéré le franchiseur ?",
+  "c": [
+   "Par des dividendes de l’État",
+   "Par un droit d’entrée et des redevances périodiques",
+   "Gratuitement",
+   "Par un salaire versé par le franchisé"
+  ],
+  "a": 1,
+  "e": "Souvent un pourcentage du chiffre d’affaires."
+ },
+ {
+  "q": "Quels sont les caractères du savoir-faire transmis ?",
+  "c": [
+   "Secret, substantiel et identifié",
+   "Public, gratuit et oral",
+   "Breveté, coté et assuré",
+   "Ancien, simple et libre"
+  ],
+  "a": 0,
+  "e": "Il doit être testé et décrit."
+ },
+ {
+  "q": "Le franchisé est-il un salarié du franchiseur ?",
+  "c": [
+   "Non, c’est un commerçant indépendant juridiquement et financièrement",
+   "Oui, toujours",
+   "Oui, pendant la période d’essai",
+   "Oui, s’il porte l’uniforme du réseau"
+  ],
+  "a": 0,
+  "e": "Il exploite à ses risques."
+ },
+ {
+  "q": "Quelle loi impose la remise d’un document d’information précontractuelle ?",
+  "c": [
+   "La loi de 1975 sur la sous-traitance",
+   "La loi Pacte",
+   "La loi Doubin du 31 décembre 1989",
+   "La loi Badinter"
+  ],
+  "a": 2,
+  "e": "Article L330-3 du Code de commerce."
+ },
+ {
+  "q": "Combien de jours avant la signature le DIP doit-il être remis ?",
+  "c": [
+   "3 jours",
+   "Au moins 20 jours",
+   "48 heures",
+   "6 mois"
+  ],
+  "a": 1,
+  "e": "Ou avant tout versement."
+ },
+ {
+  "q": "Quelle peut être la sanction d’une information précontractuelle trompeuse ?",
+  "c": [
+   "La revente à perte",
+   "Aucune",
+   "La nullité du contrat pour vice du consentement et des dommages et intérêts",
+   "Une grève"
+  ],
+  "a": 2,
+  "e": "Erreur ou dol."
+ },
+ {
+  "q": "Le franchiseur peut-il imposer au franchisé un prix de revente minimal ?",
+  "c": [
+   "Oui, toujours",
+   "Oui, pour les produits alimentaires",
+   "Non, ce serait une entente illicite ; il peut seulement conseiller des prix",
+   "Oui, si le contrat le prévoit"
+  ],
+  "a": 2,
+  "e": "Le franchisé fixe librement ses prix."
+ },
+ {
+  "q": "Quel est un avantage de la franchise pour le franchisé ?",
+  "c": [
+   "Être salarié protégé",
+   "Ne supporter aucun risque",
+   "Bénéficier d’une marque connue et d’un concept éprouvé",
+   "Ne payer aucune redevance"
+  ],
+  "a": 2,
+  "e": "Risque d’échec réduit."
+ },
+ {
+  "q": "Quel est un inconvénient de la franchise pour le franchisé ?",
+  "c": [
+   "Le coût et la dépendance envers le réseau",
+   "L’absence de marque",
+   "L’interdiction de faire des bénéfices",
+   "L’absence d’assistance"
+  ],
+  "a": 0,
+  "e": "Clauses contraignantes."
+ }
+];
+
+const FICHE = "40_le-contrat-de-franchise-un-reseau-dentreprises-independantes_fiche.pdf";
+const FDATA = {"title": "Le contrat de franchise : un réseau d’entreprises indépendantes", "blocks": [["h", "Définition", ["La **franchise** est un contrat par lequel une entreprise, le **franchiseur**, met à la disposition d’une autre, le **franchisé**, sa **marque** (enseigne, signes distinctifs), son **savoir-faire** et une **assistance** continue, en contrepartie d’une **rémunération** ; le franchisé exploite son propre commerce selon le concept du réseau.", "Elle n’est pas définie par la loi : ses éléments viennent de la pratique, de la jurisprudence, du Code de déontologie européen de la franchise et du droit européen de la concurrence (règlement d’exemption des accords verticaux).", "Exemples : restauration rapide, coiffure, hôtellerie, commerce alimentaire de proximité, immobilier, services à la personne. La France compte plusieurs milliers de réseaux de franchise et des dizaines de milliers de points de vente franchisés."]], ["table", "Les obligations des parties", ["Franchiseur", "Franchisé"], [["Transmettre un **savoir-faire** : ensemble d’informations pratiques **secret**, **substantiel** (testé, efficace) et **identifié** (décrit dans un manuel)", "Payer un **droit d’entrée** (à la signature) et des **redevances** périodiques (souvent un pourcentage du chiffre d’affaires), parfois une contribution publicitaire"], ["Concéder l’usage de la **marque** et de l’enseigne, garantir leur jouissance paisible", "Respecter les **normes** du réseau (aménagement, qualité, présentation), utiliser la marque conformément au concept, préserver l’image du réseau"], ["Fournir une **assistance** et une **formation** continues (lancement, conseils, outils de gestion, communication nationale)", "Respecter l’éventuelle clause d’**approvisionnement exclusif** ou prioritaire et la clause de **non-concurrence** ; **confidentialité** sur le savoir-faire"], ["Respecter l’éventuelle **exclusivité territoriale** accordée", "Exploiter son commerce à ses **risques** : il est un **commerçant indépendant**, juridiquement et financièrement (il doit en informer sa clientèle), employeur de son personnel"]]], ["h", "Protéger le futur franchisé : la loi Doubin", ["**Loi Doubin du 31 décembre 1989** (article **L330-3** du Code de commerce) : celui qui met à disposition un nom commercial ou une marque en exigeant un engagement d’exclusivité doit remettre au futur partenaire un **document d’information précontractuelle** (DIP) **au moins 20 jours** avant la signature du contrat ou tout versement : présentation du franchiseur et de son réseau (nombre de membres, sorties du réseau), état du marché local, durée, conditions de renouvellement et de résiliation, dépenses à engager.", "Le défaut d’information peut entraîner la **nullité** du contrat si elle a vicié le consentement (erreur, dol) et des dommages et intérêts.", "La loi Macron (2015) encadre les clauses limitant l’activité de l’exploitant **après** la fin du contrat dans les réseaux de commerce de détail (limitation à un an, aux locaux d’exploitation, nécessité de protéger le savoir-faire)."]], ["table", "Intérêts et limites", ["Pour le franchiseur", "Pour le franchisé"], [["Développer rapidement un réseau **sans investir** dans chaque point de vente, avec des exploitants motivés", "Bénéficier d’une **marque connue**, d’un concept éprouvé et d’une assistance : risque d’échec réduit, accès facilité au crédit"], ["Revenus réguliers (redevances), image homogène", "Rester **son propre patron** tout en appartenant à un réseau ; centrale d’achat"], ["Limites : contrôle indirect, risque d’atteinte à l’image par un franchisé défaillant", "Limites : **coût** (droit d’entrée, redevances), **dépendance** et faible autonomie, clauses contraignantes (non-concurrence, approvisionnement)"]]], ["h", "Franchise et droit de la concurrence", ["Le contrat de franchise est **licite** tant qu’il ne conduit pas à une **entente illicite** : le franchiseur peut **conseiller** des prix ou fixer un prix maximal, mais pas **imposer des prix de revente** minimaux au franchisé (le franchisé fixe librement ses prix). Les clauses d’exclusivité doivent rester proportionnées.", "Un franchiseur en position dominante ne doit pas abuser de cette position (conditions discriminatoires, refus d’approvisionnement injustifié)."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Le contrat de franchise : un réseau d’entreprises indépendantes</h1>
+    <p class="sub">Terminale STMG Droit – 8.4 Les partenariats contractuels</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>
