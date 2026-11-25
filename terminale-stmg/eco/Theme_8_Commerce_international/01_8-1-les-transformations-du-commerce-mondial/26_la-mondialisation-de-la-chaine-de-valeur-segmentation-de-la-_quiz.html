@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : La mondialisation de la chaîne de valeur : segmentation de la production, produits intermédiaires et produits finis</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Qu’est-ce que la chaîne de valeur ?",
+  "c": [
+   "La liste des prix pratiqués par une entreprise sur ses marchés",
+   "L’ensemble des activités successives qui permettent de concevoir, produire et vendre un produit",
+   "La suite des taux de change entre plusieurs monnaies",
+   "Le classement des entreprises selon leur valeur en Bourse"
+  ],
+  "a": 1,
+  "e": "Chaque étape ajoute de la valeur."
+ },
+ {
+  "q": "Que signifie la segmentation de la production ?",
+  "c": [
+   "Le découpage de la production d’un bien en étapes réalisées dans différents pays",
+   "La vente d’un produit à plusieurs clients différents",
+   "La séparation entre biens et services",
+   "La division d’une entreprise en plusieurs filiales nationales"
+  ],
+  "a": 0,
+  "e": "Spécialisation par étape de fabrication."
+ },
+ {
+  "q": "Quel exemple est un produit intermédiaire ?",
+  "c": [
+   "Un smartphone vendu en magasin",
+   "Une voiture neuve",
+   "Un repas au restaurant",
+   "Une puce électronique"
+  ],
+  "a": 3,
+  "e": "Il est incorporé dans un autre produit."
+ },
+ {
+  "q": "Quelle part des échanges de marchandises représentent les biens intermédiaires ?",
+  "c": [
+   "Moins de 5 %",
+   "La totalité",
+   "Plus de la moitié",
+   "Environ 10 %"
+  ],
+  "a": 2,
+  "e": "Conséquence de la segmentation."
+ },
+ {
+  "q": "Dans la « courbe du sourire », quelles étapes ont la plus faible valeur ajoutée ?",
+  "c": [
+   "La fabrication standard et l’assemblage",
+   "La recherche et la conception",
+   "Le marketing et la marque",
+   "Le service après-vente"
+  ],
+  "a": 0,
+  "e": "Le milieu de la chaîne."
+ },
+ {
+  "q": "Qui a imaginé la « courbe du sourire » ?",
+  "c": [
+   "Michael Porter",
+   "David Ricardo",
+   "Stan Shih, fondateur d’Acer",
+   "Adam Smith"
+  ],
+  "a": 2,
+  "e": "En 1992."
+ },
+ {
+  "q": "Où se trouvent les lignes d’assemblage final de l’Airbus A320 ?",
+  "c": [
+   "Uniquement à Toulouse",
+   "Uniquement en Chine",
+   "Uniquement aux États-Unis",
+   "Toulouse, Hambourg, Tianjin et Mobile"
+  ],
+  "a": 3,
+  "e": "Au plus près des marchés."
+ },
+ {
+  "q": "Pourquoi la segmentation augmente-t-elle les flux d’importations et d’exportations ?",
+  "c": [
+   "Parce qu’elle supprime tous les droits de douane entre les pays",
+   "Parce que les composants franchissent plusieurs frontières avant le produit final",
+   "Parce qu’elle réduit le nombre de produits fabriqués dans le monde",
+   "Parce qu’elle interdit l’assemblage dans le pays de consommation"
+  ],
+  "a": 1,
+  "e": "Un pays importe pour exporter."
+ },
+ {
+  "q": "Quel événement de 2021 a révélé la fragilité des chaînes de valeur ?",
+  "c": [
+   "La chute du mur de Berlin",
+   "L’entrée de la Bulgarie dans la zone euro",
+   "La pénurie de semi-conducteurs",
+   "La création de l’euro"
+  ],
+  "a": 2,
+  "e": "Usines automobiles à l’arrêt."
+ },
+ {
+  "q": "Quelle stratégie répond à la vulnérabilité des chaînes mondiales ?",
+  "c": [
+   "L’allongement des chaînes",
+   "La dépendance à un fournisseur unique",
+   "La suppression de tous les stocks",
+   "La relocalisation et la diversification des fournisseurs"
+  ],
+  "a": 3,
+  "e": "Réindustrialisation, stocks stratégiques."
+ }
+];
+
+const FICHE = "26_la-mondialisation-de-la-chaine-de-valeur-segmentation-de-la-_fiche.pdf";
+const FDATA = {"title": "La mondialisation de la chaîne de valeur : segmentation de la production, produits intermédiaires et produits finis", "blocks": [["h", "La chaîne de valeur", ["La **chaîne de valeur** est l’ensemble des **activités successives** qui permettent de concevoir, produire, vendre et assurer le suivi d’un produit : **recherche et développement**, conception (design), approvisionnement en matières premières, fabrication des **composants**, **assemblage**, logistique, marketing, distribution, service après-vente. Chaque étape **ajoute de la valeur** au produit (notion popularisée par [[Michael Porter|?Michael_Porter]] en 1985).", "Elle devient une **chaîne de valeur mondiale** quand ces étapes sont **réparties entre plusieurs pays** : c’est la **décomposition internationale des processus productifs** (DIPP)."]], ["table", "La segmentation de la production", ["Notion", "Définition", "Exemple"], [["Segmentation (fragmentation)", "Découpage de la production d’un bien en **segments** (étapes) réalisés dans différents pays, selon les avantages de chacun", "Les entreprises et les pays se spécialisent par **étape de fabrication** plutôt que par produit"], ["Produits intermédiaires", "Biens destinés à être **transformés** ou incorporés dans un autre produit", "Puces électroniques, écrans, batteries, pièces de moteur, tissus"], ["Produits finis", "Biens prêts à être **consommés** ou utilisés", "Smartphone, voiture, vêtement"], ["Assemblage", "Étape où les composants sont réunis pour former le produit fini", "Souvent dans des pays à main-d’œuvre moins coûteuse"]]], ["table", "Deux exemples de chaînes de valeur mondiales", ["Produit", "Organisation"], [["Un smartphone", "Conception et logiciel aux **États-Unis** ; puces fabriquées à **Taïwan** ; écrans et mémoires en **Corée du Sud** et au **Japon** ; assemblage en **Chine**, en **Inde** ou au **Vietnam** ; vente dans le monde entier. Le produit est « **fabriqué dans le monde** » plus que dans un seul pays"], ["Un avion Airbus A320", "Pièces et sous-ensembles produits en France, en Allemagne, en Espagne, au Royaume-Uni et par des sous-traitants du monde entier ; **lignes d’assemblage final** à Toulouse, Hambourg, Tianjin (Chine) et Mobile (États-Unis), au plus près des marchés"]]], ["table", "Qui capte la valeur ? La « courbe du sourire »", ["Étape", "Valeur ajoutée", "Pays concernés"], [["Amont : recherche, conception, brevets, design", "**Forte**", "Surtout les pays développés"], ["Milieu : fabrication des composants standard, assemblage", "**Faible**", "Pays à bas salaires, souvent émergents"], ["Aval : marketing, marque, distribution, services", "**Forte**", "Surtout les pays développés (sièges des marques)"], ["Évolution", "La courbe, imaginée par [[Stan Shih|?Stan_Shih]] (fondateur d’Acer, 1992), se creuse", "Des émergents **montent en gamme** : la Chine domine désormais les véhicules électriques, les batteries et les panneaux solaires"]]], ["h", "La segmentation multiplie les flux d’échanges", ["Un composant peut **franchir plusieurs frontières** avant d’être intégré au produit final : chaque passage est compté comme une importation puis une exportation. Un pays **importe pour exporter** : une partie de la valeur de ses exportations provient de composants importés.", "Résultat : les **échanges de biens intermédiaires** représentent **plus de la moitié** des échanges internationaux de marchandises. Pour mesurer qui crée réellement la valeur, l’OCDE et l’OMC calculent les échanges **en valeur ajoutée**.", "Les entreprises segmentent leur production pour **réduire les coûts** (main-d’œuvre, fiscalité), accéder à des **compétences** ou des **ressources**, et se rapprocher des **marchés**."]], ["h", "Des chaînes vulnérables, en recomposition", ["La crise sanitaire (pénuries de masques et de médicaments, 2020), la pénurie de **semi-conducteurs** (2021), le blocage du canal de Suez (2021), les attaques en mer Rouge (2024) et le conflit autour du détroit d’Ormuz (2026) ont révélé la **fragilité** de chaînes très longues.", "D’où des stratégies de **relocalisation** ou de rapprochement (réindustrialisation, production dans des pays proches ou alliés), de **diversification** des fournisseurs et de constitution de **stocks stratégiques**. Le transport sur de longues distances a aussi un **coût environnemental**."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : La mondialisation de la chaîne de valeur : segmentation de la production, produits intermédiaires et produits finis</h1>
+    <p class="sub">Terminale STMG Économie – 8.1 Les transformations du commerce mondial</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

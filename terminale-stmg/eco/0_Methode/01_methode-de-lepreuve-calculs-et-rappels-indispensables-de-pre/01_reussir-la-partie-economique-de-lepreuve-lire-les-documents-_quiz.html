@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Réussir la partie économique de l’épreuve : lire les documents, répondre aux questions, argumenter</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Sur combien de points est notée la partie économique de l’épreuve écrite de droit et économie ?",
+  "c": [
+   "6 points",
+   "20 points",
+   "10 points",
+   "14 points"
+  ],
+  "a": 2,
+  "e": "Chaque partie (juridique et économique) est notée sur 10 points."
+ },
+ {
+  "q": "Combien de temps dure l’épreuve écrite de droit et économie ?",
+  "c": [
+   "3 heures",
+   "4 heures",
+   "2 heures",
+   "5 heures"
+  ],
+  "a": 1,
+  "e": "Deux parties d’environ 2 heures chacune."
+ },
+ {
+  "q": "Quelle compétence fait partie des objectifs de la partie économique ?",
+  "c": [
+   "Réciter des définitions sans lien avec les documents",
+   "Rédiger un commentaire d’arrêt",
+   "Qualifier juridiquement une situation",
+   "Répondre de façon argumentée à une question de débat économique"
+  ],
+  "a": 3,
+  "e": "Les autres : expliquer des mécanismes, interpréter des données, calculer."
+ },
+ {
+  "q": "Que faut-il toujours indiquer avec un résultat de calcul ?",
+  "c": [
+   "Un arrondi à l’entier",
+   "Son unité et une phrase de lecture",
+   "La formule seulement",
+   "Le nom du professeur"
+  ],
+  "a": 1,
+  "e": "Ex. : « les exportations ont augmenté de 2,5 % entre 2024 et 2025 »."
+ },
+ {
+  "q": "Dans une argumentation, que contient l’introduction ?",
+  "c": [
+   "Une liste de chiffres",
+   "Accroche, définitions, problématique et annonce du plan",
+   "Uniquement la conclusion",
+   "Une opinion personnelle non justifiée"
+  ],
+  "a": 1,
+  "e": "Elle pose le débat."
+ },
+ {
+  "q": "Quel est le schéma d’un argument bien construit ?",
+  "c": [
+   "Chiffre seul, puis passage à l’argument suivant",
+   "Idée, mécanisme, illustration chiffrée, conclusion partielle",
+   "Opinion personnelle suivie d’une question rhétorique",
+   "Citation de l’annexe recopiée sans explication"
+  ],
+  "a": 1,
+  "e": "L’illustration est tirée des annexes."
+ },
+ {
+  "q": "Quel connecteur exprime une opposition ?",
+  "c": [
+   "Par conséquent",
+   "Cependant",
+   "De plus",
+   "En effet"
+  ],
+  "a": 1,
+  "e": "Toutefois, néanmoins, en revanche aussi."
+ },
+ {
+  "q": "Quelle était la question d’argumentation de la session 2026 ?",
+  "c": [
+   "Le libre-échange est-il toujours bénéfique aux pays en développement ?",
+   "Faut-il supprimer les droits de douane entre l’Union européenne et les États-Unis ?",
+   "Les dépenses publiques d’investissement permettent-elles de relancer l’activité économique ?",
+   "La hausse du SMIC est-elle responsable de la hausse du chômage ?"
+  ],
+  "a": 2,
+  "e": "Le sujet portait sur l’État et les JOP de Paris 2024."
+ },
+ {
+  "q": "Quelle première étape s’impose pour lire un tableau statistique ?",
+  "c": [
+   "Recopier toutes les données dans la copie",
+   "Rédiger directement la conclusion de la réponse",
+   "Repérer sa nature, sa source, sa date et son unité",
+   "Calculer la moyenne de toutes les données du tableau"
+  ],
+  "a": 2,
+  "e": "Sans unité, aucune lecture juste n’est possible."
+ },
+ {
+  "q": "Quelle erreur est fréquente dans les copies ?",
+  "c": [
+   "Définir les termes du sujet",
+   "Confondre déficit public et dette publique",
+   "Citer la source d’un chiffre",
+   "Nuancer sa réponse"
+  ],
+  "a": 1,
+  "e": "Le déficit est un flux annuel, la dette un stock."
+ }
+];
+
+const FICHE = "01_reussir-la-partie-economique-de-lepreuve-lire-les-documents-_fiche.pdf";
+const FDATA = {"title": "Réussir la partie économique de l’épreuve : lire les documents, répondre aux questions, argumenter", "blocks": [["h", "L’épreuve écrite de spécialité droit et économie", ["L’épreuve dure **4 heures** et comprend **deux parties indépendantes** : une partie **juridique** et une partie **économique**, chacune notée sur **10 points** et prévue pour être traitée en **2 heures environ** (le candidat gère librement son temps). Elle porte sur le programme de **terminale**, les notions de première pouvant être mobilisées.", "La partie économique est un **dossier de plusieurs documents** (textes, tableaux statistiques, graphiques) accompagné de **questions** portant sur un ou plusieurs thèmes du programme. **0,5 point** de la partie économique est réservé à la **maîtrise de la langue** (orthographe, syntaxe) selon la note de service du 11 septembre 2026, applicable à partir de la session 2027.", "Quatre compétences sont évaluées : **expliquer des notions et des mécanismes** en s’appuyant sur ses connaissances et sur les documents ; **interpréter des données** de sources variées ; **effectuer des calculs** économiques liés au programme ; **répondre de façon argumentée** à une question portant sur un **débat économique** actuel.", "Exemple de la session 2026 (17 juin 2026) : le **rôle économique de l’État** et les effets des **Jeux olympiques et paralympiques de Paris 2024**. Questions : rappeler les fonctions économiques de l’État ; commenter les effets des Jeux sur l’emploi (tableaux de l’Insee) ; présenter leurs effets à court et à long terme sur la croissance ; rédiger une argumentation : « Les dépenses publiques d’investissement permettent-elles de relancer l’activité économique ? ».", "En cas d’oral de contrôle (second groupe) : 20 minutes de préparation, 20 minutes d’épreuve, sur la partie juridique **ou** économique, à partir de documents et de questions (10 minutes d’exposé puis un échange)."]], ["table", "Les consignes et ce qu’elles attendent", ["Verbe de consigne", "Ce qu’il faut faire"], [["Définir, rappeler, présenter", "Donner la **définition précise** de la notion (vocabulaire du cours), éventuellement illustrée par un exemple tiré des annexes"], ["Identifier, relever, repérer", "Extraire des annexes les éléments demandés, **sans paraphraser** : les classer, les nommer avec le vocabulaire économique"], ["Calculer", "Poser la **formule**, faire le calcul, donner le résultat avec son **unité** et une **phrase de lecture** (« les exportations ont augmenté de 2,5 % entre 2024 et 2025 »)"], ["Comparer, commenter une évolution", "Dégager la **tendance générale**, les **chiffres clés** (début, fin, maximum, minimum), les ruptures, puis **expliquer** l’évolution avec le cours"], ["Expliquer, montrer, justifier", "Exposer un **mécanisme** par un enchaînement logique de causes et de conséquences (« car », « donc », « ce qui entraîne »), appuyé sur les annexes"], ["Analyser les effets, les enjeux", "Distinguer les effets **positifs et négatifs**, à **court et à long terme**, pour les différents **acteurs** (ménages, entreprises, État)"], ["Rédiger une argumentation", "Répondre à une **question de débat** par un texte structuré : introduction, développement en deux parties, conclusion (voir ci-dessous)"]]], ["flow", "Lire un document statistique en cinq étapes", ["Nature, titre, source et date (Insee, Eurostat, Banque de France…)", "Unité : euros, milliards, %, points, indice base 100, valeur ou volume", "Phrase de lecture d’une donnée : « Selon l’Insee, en 2025, … »", "Tendance générale, chiffres extrêmes, ruptures", "Lien avec la question posée et le cours"]], ["table", "Construire la réponse argumentée (question de débat)", ["Partie", "Contenu attendu"], [["Introduction", "Une **accroche** (fait d’actualité, chiffre des annexes) ; la **définition des termes** du sujet ; la **problématique** (la question reformulée, qui fait apparaître le débat) ; l’**annonce du plan**"], ["Développement", "Deux parties : les **arguments favorables** puis les **limites** (ou l’inverse). Chaque argument suit le schéma **idée – mécanisme – illustration chiffrée tirée des annexes – conclusion partielle**"], ["Conclusion", "Une **réponse nuancée** à la question (« oui, à condition que… », « à court terme mais pas à long terme ») et éventuellement une **ouverture**"], ["Connecteurs utiles", "Tout d’abord, de plus, en outre (ajout) ; car, en effet (cause) ; donc, par conséquent, ainsi (conséquence) ; cependant, toutefois, néanmoins (opposition) ; par exemple, comme le montre l’annexe 2 (illustration)"]]], ["h", "Les erreurs les plus fréquentes", ["**Paraphraser** les annexes au lieu de les analyser avec les notions du cours ; recopier des chiffres **sans unité, sans date ni source**.", "Confondre **pourcentage** et **point de pourcentage**, **valeur** et **volume**, **déficit** (flux annuel) et **dette** (stock), **taux de chômage** et **nombre de chômeurs**.", "Donner une **opinion personnelle** non argumentée (« je pense que… ») ou une réponse sans nuance à une question de débat.", "Oublier de **répondre explicitement** à la question posée, ou traiter un autre sujet (hors sujet)."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Réussir la partie économique de l’épreuve : lire les documents, répondre aux questions, argumenter</h1>
+    <p class="sub">Terminale STMG Économie – Méthode de l’épreuve, calculs et rappels indispensables de première</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

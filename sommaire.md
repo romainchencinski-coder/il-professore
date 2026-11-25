@@ -317,3 +317,83 @@
 
 - 39. Le contrat d’entreprise et la sous-traitance – fiche PDF + quiz de 10 questions
 - 40. Le contrat de franchise : un réseau d’entreprises indépendantes – fiche PDF + quiz de 10 questions
+
+## Terminale STMG – Économie (spécialité droit et économie, STMG)
+
+### Méthode et rappels de première – chapitre 1 : Méthode de l’épreuve, calculs et rappels indispensables de première
+
+- 1. Réussir la partie économique de l’épreuve : lire les documents, répondre aux questions, argumenter – fiche PDF + quiz de 10 questions
+- 2. Les calculs économiques indispensables : taux de variation, indices, parts, points, volume et taux du marché du travail – fiche PDF + quiz de 10 questions
+- 3. Rappels de première indispensables : agents, production et PIB, répartition des revenus, financement et marchés – fiche PDF + quiz de 10 questions
+
+### Thème 6 – Comment l’État peut-il intervenir dans l’économie ? – chapitre 1 : 6.1 L’intervention de l’État
+
+- 4. De l’État gendarme à l’État-providence : les fonctions économiques de l’État, entre libéralisme et interventionnisme – fiche PDF + quiz de 10 questions
+- 5. Mesurer la place de l’État : dépenses publiques, prélèvements obligatoires, emploi public et entreprises publiques – fiche PDF + quiz de 10 questions
+- 6. Budget, déficit public et dette publique : définitions, causes, financement et soutenabilité – fiche PDF + quiz de 10 questions
+
+### Thème 6 – Comment l’État peut-il intervenir dans l’économie ? – chapitre 2 : 6.2 Défaillances des marchés et défaillances de l’État
+
+- 7. Les défaillances du marché (1) : allocation inefficace, asymétries d’information et pouvoir de marché – fiche PDF + quiz de 10 questions
+- 8. Les défaillances du marché (2) : externalités, biens publics et biens communs – fiche PDF + quiz de 10 questions
+- 9. Corriger les défaillances du marché et limites de l’action publique : les défaillances de l’État – fiche PDF + quiz de 10 questions
+
+### Thème 6 – Comment l’État peut-il intervenir dans l’économie ? – chapitre 3 : 6.3 Les politiques économiques de l’État et de l’Europe
+
+- 10. Fluctuations et cycles économiques : expansion, crise, récession, dépression, reprise – fiche PDF + quiz de 10 questions
+- 11. Les politiques économiques : objectifs, politiques conjoncturelles et structurelles, politiques de demande et d’offre – fiche PDF + quiz de 10 questions
+- 12. La politique budgétaire : relance, stabilisation, limites et critères européens des déficits publics – fiche PDF + quiz de 10 questions
+- 13. La politique monétaire européenne : la BCE, les taux directeurs et leurs canaux de transmission – fiche PDF + quiz de 10 questions
+- 14. La politique de la concurrence : ententes, abus de position dominante, concentrations et aides d’État – fiche PDF + quiz de 10 questions
+
+### Thème 6 – Comment l’État peut-il intervenir dans l’économie ? – chapitre 4 : 6.4 Les politiques sociales
+
+- 15. Inégalités socio-économiques et objectifs des politiques sociales : redistribution horizontale et verticale – fiche PDF + quiz de 10 questions
+- 16. La protection sociale : risques sociaux, logiques d’assurance et d’assistance, prestations et organisation – fiche PDF + quiz de 10 questions
+- 17. Financer la protection sociale et redistribuer : impôts, cotisations sociales et progressivité des prélèvements obligatoires – fiche PDF + quiz de 10 questions
+
+### Thème 7 – Quelle est l’influence de l’État sur l’évolution de l’emploi et du chômage ? – chapitre 1 : 7.1 Activité et chômage
+
+- 18. Population active, emploi et chômage : définitions, mesures et calculs (BIT, Insee) – fiche PDF + quiz de 10 questions
+- 19. Les différentes formes de chômage : frictionnel, volontaire, involontaire et conjoncturel, structurel – fiche PDF + quiz de 10 questions
+
+### Thème 7 – Quelle est l’influence de l’État sur l’évolution de l’emploi et du chômage ? – chapitre 2 : 7.2 L’offre et la demande de travail
+
+- 20. Le marché du travail : offre et demande de travail, leurs déterminants et le salaire d’équilibre – fiche PDF + quiz de 10 questions
+- 21. Les spécificités du marché du travail : négociations salariales, contraintes légales et conventionnelles, salaire minimum – fiche PDF + quiz de 10 questions
+- 22. Plein emploi, sous-emploi et chômage : déséquilibres du marché du travail, demande anticipée, chômage structurel et conjoncturel – fiche PDF + quiz de 10 questions
+
+### Thème 7 – Quelle est l’influence de l’État sur l’évolution de l’emploi et du chômage ? – chapitre 3 : 7.3 Les politiques de l’emploi
+
+- 23. Politiques passives et politiques actives de l’emploi : objectifs, instruments et exemples français – fiche PDF + quiz de 10 questions
+- 24. Agir contre le chômage conjoncturel et le chômage structurel : leviers, contraintes de la zone euro et débats – fiche PDF + quiz de 10 questions
+
+### Thème 8 – Comment organiser le commerce international dans un contexte d’ouverture des échanges ? – chapitre 1 : 8.1 Les transformations du commerce mondial
+
+- 25. Le développement des échanges internationaux de biens et services et la balance commerciale – fiche PDF + quiz de 10 questions
+- 26. La mondialisation de la chaîne de valeur : segmentation de la production, produits intermédiaires et produits finis – fiche PDF + quiz de 10 questions
+- 27. Les investissements directs à l’étranger et les firmes multinationales : motivations, attractivité et effets – fiche PDF + quiz de 10 questions
+- 28. La régionalisation des échanges : zones d’intégration régionale et accords commerciaux – fiche PDF + quiz de 10 questions
+
+### Thème 8 – Comment organiser le commerce international dans un contexte d’ouverture des échanges ? – chapitre 2 : 8.2 Des politiques commerciales divergentes
+
+- 29. Libre-échange ou autarcie : les avantages et les limites de l’ouverture aux échanges – fiche PDF + quiz de 10 questions
+- 30. Le protectionnisme : instruments tarifaires et non tarifaires, justifications et retour des barrières commerciales (2018-2026) – fiche PDF + quiz de 10 questions
+
+### Thème 8 – Comment organiser le commerce international dans un contexte d’ouverture des échanges ? – chapitre 3 : 8.3 Une organisation mondiale pour gérer les différends entre États
+
+- 31. L’Organisation mondiale du commerce : missions, principes de fonctionnement et cycles de négociations – fiche PDF + quiz de 10 questions
+- 32. L’Organe de règlement des différends et la crise du multilatéralisme commercial – fiche PDF + quiz de 10 questions
+
+### Thème 9 – Comment concilier la croissance économique et le développement durable ? – chapitre 1 : 9.1 Les sources d’une croissance économique soutenable
+
+- 33. La croissance économique : définition, mesure et sources (facteurs de production, progrès technique, innovation, institutions) – fiche PDF + quiz de 10 questions
+- 34. Les limites écologiques de la croissance et le développement durable : ressources, pollutions et indicateurs – fiche PDF + quiz de 10 questions
+- 35. La transition écologique et ses instruments : réglementation, normes, labels, taxation, quotas et subventions – fiche PDF + quiz de 10 questions
+- 36. Économie circulaire, économie collaborative et économie sociale et solidaire : de nouvelles façons de produire et de consommer – fiche PDF + quiz de 10 questions
+- 37. Les biens publics mondiaux et la nécessité de la coopération internationale – fiche PDF + quiz de 10 questions
+
+### Thème 9 – Comment concilier la croissance économique et le développement durable ? – chapitre 2 : 9.2 La réduction de la pauvreté et le rôle de l’éducation et de la formation
+
+- 38. Pauvreté absolue, pauvreté relative et inégalités dans le monde : mesurer, comprendre, agir – fiche PDF + quiz de 10 questions
+- 39. L’éducation et la formation, moteurs du développement et de la lutte contre la pauvreté – fiche PDF + quiz de 10 questions

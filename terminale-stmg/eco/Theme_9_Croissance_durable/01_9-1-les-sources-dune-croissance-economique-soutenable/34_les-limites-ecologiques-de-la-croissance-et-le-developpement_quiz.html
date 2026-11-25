@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Les limites écologiques de la croissance et le développement durable : ressources, pollutions et indicateurs</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Qu’est-ce qu’une ressource non renouvelable ?",
+  "c": [
+   "Une ressource en stock fini que son exploitation épuise",
+   "Une ressource qui se reconstitue rapidement",
+   "Une ressource produite par l’industrie",
+   "Une ressource gratuite pour tous"
+  ],
+  "a": 0,
+  "e": "Ex. : pétrole, minerais."
+ },
+ {
+  "q": "Quel exemple est une ressource renouvelable ?",
+  "c": [
+   "Le charbon",
+   "L’énergie solaire",
+   "L’uranium",
+   "Le gaz naturel"
+  ],
+  "a": 1,
+  "e": "Elle se reconstitue à l’échelle humaine."
+ },
+ {
+  "q": "Quel rapport de 1972 alertait sur les limites de la croissance ?",
+  "c": [
+   "Le rapport Beveridge",
+   "Le rapport Brundtland",
+   "Le rapport Draghi",
+   "Le rapport Meadows (Club de Rome)"
+  ],
+  "a": 3,
+  "e": "« Les limites à la croissance »."
+ },
+ {
+  "q": "Comment le rapport Brundtland (1987) définit-il le développement durable ?",
+  "c": [
+   "Un développement qui répond aux besoins du présent sans compromettre ceux des générations futures",
+   "Une croissance du PIB supérieure à 3 % par an dans tous les pays",
+   "La protection de l’environnement à tout prix, quel qu’en soit le coût social",
+   "L’arrêt de toute production industrielle dans les pays riches"
+  ],
+  "a": 0,
+  "e": "Définition de référence."
+ },
+ {
+  "q": "Quels sont les trois piliers du développement durable ?",
+  "c": [
+   "Local, national, mondial",
+   "Agricole, industriel, tertiaire",
+   "Économique, social, environnemental",
+   "Monétaire, budgétaire, fiscal"
+  ],
+  "a": 2,
+  "e": "Équilibre entre les trois."
+ },
+ {
+  "q": "Quelles dimensions combine l’IDH ?",
+  "c": [
+   "Exportations, importations et IDE",
+   "PIB, inflation et chômage",
+   "Dette, déficit et impôts",
+   "Espérance de vie, éducation et revenu par habitant"
+  ],
+  "a": 3,
+  "e": "Créé par le PNUD en 1990."
+ },
+ {
+  "q": "Quand est tombé le jour du dépassement mondial en 2026 ?",
+  "c": [
+   "Le 31 décembre",
+   "Le 30 juillet",
+   "Le 14 juillet",
+   "Le 1er janvier"
+  ],
+  "a": 1,
+  "e": "Au-delà, l’humanité vit « à crédit »."
+ },
+ {
+  "q": "Pourquoi le PIB est-il un indicateur insuffisant ?",
+  "c": [
+   "Il ne mesure pas la production des entreprises",
+   "Il ne concerne que la production agricole",
+   "Il ne mesure ni la dégradation de l’environnement ni les inégalités",
+   "Il est calculé uniquement en dollars américains"
+  ],
+  "a": 2,
+  "e": "Rapport Stiglitz-Sen-Fitoussi (2009)."
+ },
+ {
+  "q": "Qu’est-ce que le découplage ?",
+  "c": [
+   "Produire plus en émettant moins de gaz à effet de serre",
+   "Supprimer la monnaie",
+   "Séparer l’économie de l’État",
+   "Arrêter tout commerce international"
+  ],
+  "a": 0,
+  "e": "Argument de la croissance verte."
+ },
+ {
+  "q": "Que défend la soutenabilité forte ?",
+  "c": [
+   "Certains éléments du capital naturel sont irremplaçables",
+   "La pollution n’a aucun coût",
+   "La croissance doit être maximale",
+   "Le capital naturel peut toujours être remplacé par la technique"
+  ],
+  "a": 0,
+  "e": "Climat, biodiversité."
+ }
+];
+
+const FICHE = "34_les-limites-ecologiques-de-la-croissance-et-le-developpement_fiche.pdf";
+const FDATA = {"title": "Les limites écologiques de la croissance et le développement durable : ressources, pollutions et indicateurs", "blocks": [["table", "Ressources renouvelables et non renouvelables", ["Type", "Définition", "Exemples"], [["Ressources **renouvelables**", "Ressources qui se **reconstituent** à l’échelle d’une vie humaine, à condition de ne pas être exploitées plus vite que leur rythme de renouvellement", "Énergie solaire et éolienne, biomasse, forêts, eau douce, poissons"], ["Ressources **non renouvelables**", "Ressources en **stock fini**, formées sur des millions d’années : leur exploitation les **épuise**", "Pétrole, gaz, charbon, uranium, minerais (cuivre, lithium, terres rares)"]]], ["table", "Les limites écologiques de la croissance", ["Limite", "Contenu"], [["Épuisement des ressources", "Surexploitation des ressources non renouvelables et de certaines ressources renouvelables (pêche, forêts, nappes d’eau) ; dégradations parfois **irréversibles**"], ["Pollutions", "Air, eau, sols, plastiques ; effets sur la santé"], ["Changement climatique", "Émissions de **gaz à effet de serre** (dioxyde de carbone, méthane) liées surtout aux énergies fossiles ; **2024** a été la première année civile plus chaude de 1,5 °C que l’ère préindustrielle (Copernicus)"], ["Perte de biodiversité", "Environ **un million d’espèces** menacées d’extinction (IPBES, 2019)"], ["Dépassement", "L’humanité consomme chaque année plus que ce que la planète régénère : le **jour du dépassement** mondial est tombé le **30 juillet** en 2026"], ["Alerte ancienne", "Le **rapport [[Meadows|?Dennis_Meadows]]** pour le Club de Rome (« Les limites à la croissance », 1972) annonçait déjà qu’une croissance infinie était impossible dans un monde fini"]]], ["h", "Le développement durable", ["Le **rapport [[Brundtland|Gro_Harlem_Brundtland]]** (1987) le définit comme « un développement qui répond aux **besoins du présent** sans compromettre la capacité des **générations futures** de répondre aux leurs ».", "Il repose sur **trois piliers** : **économique** (efficacité, croissance), **social** (équité, réduction de la pauvreté, santé, éducation) et **environnemental** (préservation des ressources et des écosystèmes).", "Il a été consacré par le **Sommet de la Terre de Rio** (1992), les **17 objectifs de développement durable** de l’ONU (Agenda 2030, adopté en 2015) et l’**accord de Paris** sur le climat (2015)."]], ["table", "Mesurer autrement que par le PIB", ["Indicateur", "Contenu"], [["Limites du PIB", "Il ne mesure ni la dégradation de l’environnement, ni les inégalités, ni le bien-être, ni le travail domestique ; une catastrophe peut même l’augmenter (reconstruction). Rapport **[[Stiglitz|Joseph_Stiglitz]]-Sen-[[Fitoussi|Jean-Paul_Fitoussi]]** (2009)"], ["Indice de développement humain (IDH)", "Créé par le PNUD (1990) à partir des travaux d’[[Amartya Sen|Amartya_Sen]] : **espérance de vie**, **éducation** (durée de scolarisation) et **revenu** par habitant ; il va de 0 à 1"], ["PIB vert", "PIB diminué des coûts de la dégradation de l’environnement et de l’épuisement des ressources"], ["Empreinte écologique", "Surface productive nécessaire pour produire ce que consomme une population et absorber ses déchets, comparée à la surface disponible"], ["Empreinte carbone", "Émissions liées à la consommation d’un pays, y compris celles des produits importés"], ["Nouveaux indicateurs de richesse", "En France, la loi du 13 avril 2015 oblige le gouvernement à présenter chaque année des indicateurs complémentaires au PIB (emploi, inégalités, émissions, artificialisation des sols…)"]]], ["h", "Croissance et environnement : un débat", ["Les partisans de la **croissance verte** misent sur le **découplage** : grâce à l’innovation et aux énergies décarbonées, produire plus en émettant moins (les émissions territoriales de la France ont baissé depuis 1990 alors que le PIB augmentait).", "Les partisans de la **décroissance** ou de la **sobriété** jugent ce découplage insuffisant et trop lent : il faudrait réduire la production et la consommation matérielles.", "**Soutenabilité faible** : le capital naturel peut être remplacé par du capital produit (technologies). **Soutenabilité forte** : certains éléments du capital naturel (climat, biodiversité) sont **irremplaçables** et doivent être préservés."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Les limites écologiques de la croissance et le développement durable : ressources, pollutions et indicateurs</h1>
+    <p class="sub">Terminale STMG Économie – 9.1 Les sources d’une croissance économique soutenable</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

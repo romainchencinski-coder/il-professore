@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : L’éducation et la formation, moteurs du développement et de la lutte contre la pauvreté</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Qui a développé la théorie du capital humain ?",
+  "c": [
+   "Gary Becker",
+   "John Maynard Keynes",
+   "Adam Smith",
+   "Karl Marx"
+  ],
+  "a": 0,
+  "e": "Le Capital humain, 1964."
+ },
+ {
+  "q": "Qu’est-ce que le capital humain ?",
+  "c": [
+   "Le patrimoine financier détenu par les ménages",
+   "L’ensemble des connaissances, compétences et de l’état de santé qui rendent une personne productive",
+   "Les machines et logiciels utilisés par les salariés",
+   "Le nombre de salariés employés par une entreprise"
+  ],
+  "a": 1,
+  "e": "Se former est un investissement."
+ },
+ {
+  "q": "Pourquoi l’éducation a-t-elle des externalités positives ?",
+  "c": [
+   "Elle ne profite qu’à l’élève qui a fait des études",
+   "Elle réduit le nombre d’écoles dans chaque pays",
+   "Une personne formée rend aussi les autres plus productifs et diffuse des connaissances",
+   "Elle augmente le prix des manuels et des livres"
+  ],
+  "a": 2,
+  "e": "Croissance endogène (Lucas)."
+ },
+ {
+  "q": "De combien une année d’études supplémentaire augmente-t-elle en moyenne le salaire dans le monde ?",
+  "c": [
+   "Environ 0,1 %",
+   "Environ 9 %",
+   "Elle le diminue",
+   "Environ 90 %"
+  ],
+  "a": 1,
+  "e": "Estimation de la Banque mondiale."
+ },
+ {
+  "q": "En France, le taux de chômage des personnes sans diplôme est…",
+  "c": [
+   "Nul",
+   "Inférieur à celui des diplômés",
+   "Égal à celui des diplômés",
+   "Près de trois fois celui des diplômés du supérieur"
+  ],
+  "a": 3,
+  "e": "Le diplôme protège du chômage."
+ },
+ {
+  "q": "Que sont les « capabilités » selon Amartya Sen ?",
+  "c": [
+   "Les capacités de production d’une usine",
+   "Les possibilités réelles de chacun de choisir sa vie",
+   "Les compétences d’un manager",
+   "Les capitaux d’une entreprise"
+  ],
+  "a": 1,
+  "e": "L’éducation en est une condition."
+ },
+ {
+  "q": "Quel objectif de développement durable concerne l’éducation ?",
+  "c": [
+   "L’objectif n° 13",
+   "L’objectif n° 4",
+   "L’objectif n° 1",
+   "L’objectif n° 17"
+  ],
+  "a": 1,
+  "e": "Éducation de qualité d’ici 2030."
+ },
+ {
+  "q": "Combien d’enfants et de jeunes ne sont pas scolarisés dans le monde selon l’Unesco ?",
+  "c": [
+   "Aucun",
+   "Environ 2 millions",
+   "Environ 270 millions",
+   "Environ 2,7 milliards"
+  ],
+  "a": 2,
+  "e": "Surtout en Afrique subsaharienne."
+ },
+ {
+  "q": "Que prévoit l’obligation de formation en France depuis 2020 ?",
+  "c": [
+   "Tout adulte doit reprendre des études",
+   "Le baccalauréat devient obligatoire",
+   "Les entreprises doivent embaucher des apprentis",
+   "Tout jeune de 16 à 18 ans doit être en études, en formation ou en emploi"
+  ],
+  "a": 3,
+  "e": "Lutte contre le décrochage."
+ },
+ {
+  "q": "Quelle limite de la formation continue est souvent soulignée ?",
+  "c": [
+   "Les moins qualifiés se forment le moins",
+   "Elle n’existe pas en France",
+   "Elle est réservée aux chômeurs",
+   "Elle est interdite aux salariés"
+  ],
+  "a": 0,
+  "e": "Elle peut accroître les inégalités."
+ }
+];
+
+const FICHE = "39_leducation-et-la-formation-moteurs-du-developpement-et-de-la_fiche.pdf";
+const FDATA = {"title": "L’éducation et la formation, moteurs du développement et de la lutte contre la pauvreté", "blocks": [["h", "Le capital humain", ["[[Gary Becker|?Gary_Becker]] (*Le Capital humain*, 1964, prix Nobel 1992) définit le **capital humain** comme l’ensemble des **connaissances, compétences, savoir-faire et de l’état de santé** qu’une personne accumule et qui la rendent plus productive. Se former est un **investissement** : il a un coût (frais, revenus auxquels on renonce pendant les études) et rapporte des revenus futurs plus élevés.", "Pour les théories de la **croissance endogène** ([[Robert Lucas|?Robert_Lucas]], 1988), le capital humain a des **externalités positives** : une personne formée rend aussi ses collègues plus productifs, diffuse des connaissances et favorise l’innovation. Comme le marché en produirait trop peu, son financement **public** est justifié."]], ["table", "Les effets de l’éducation et de la formation", ["Niveau", "Effets"], [["Pour l’individu", "**Revenus** plus élevés (chaque année d’études supplémentaire augmente le salaire d’environ 9 % en moyenne dans le monde, selon les estimations de la Banque mondiale) ; **emploi** plus stable : en France, le taux de chômage des personnes sans diplôme est près de **trois fois** celui des diplômés du supérieur ; meilleure santé, participation à la vie citoyenne"], ["Pour la société", "**Croissance** (productivité, innovation, adaptation aux nouvelles technologies), **réduction de la pauvreté** (sortie de la pauvreté des familles), **égalité des chances**, démocratie"], ["L’éducation des filles", "Elle réduit la mortalité infantile, la fécondité précoce, améliore la santé et les revenus des familles : un levier majeur de développement"], ["Une liberté", "Pour [[Amartya Sen|Amartya_Sen]] (prix Nobel 1998), le développement consiste à élargir les **capabilités**, c’est-à-dire les possibilités réelles de chacun de choisir sa vie : l’éducation en est une condition ; elle est l’une des trois dimensions de l’**IDH**"]]], ["table", "L’éducation dans le monde", ["Indicateur", "Donnée"], [["Objectif", "**Objectif de développement durable n° 4** : assurer une éducation de qualité, inclusive et équitable, et des possibilités d’apprentissage tout au long de la vie d’ici 2030"], ["Enfants non scolarisés", "Environ **270 millions** d’enfants et de jeunes ne vont pas à l’école (Unesco, 2025), dont une grande partie en Afrique subsaharienne ; les filles sont souvent les plus touchées"], ["Qualité", "La Banque mondiale estime qu’environ **70 %** des enfants de 10 ans des pays à revenu faible et intermédiaire ne savent pas lire et comprendre un texte simple (« **pauvreté des apprentissages** », 2022)"]]], ["table", "La formation en France", ["Dispositif", "Contenu"], [["Obligation de formation", "Depuis 2020, tout jeune de **16 à 18 ans** doit être en études, en apprentissage, en formation ou en emploi"], ["Apprentissage", "Formation en alternance entre un centre de formation et une entreprise ; plus de 850 000 nouveaux contrats par an en 2023 et 2024"], ["Compte personnel de formation (CPF)", "Créé en 2015 : 500 € par an (plafond de 5 000 €), davantage pour les moins qualifiés ; participation forfaitaire du titulaire d’environ 100 € depuis 2024"], ["Formation tout au long de la vie", "Validation des acquis de l’expérience, formations des demandeurs d’emploi par France Travail, plans de formation des entreprises"]]], ["h", "Les limites", ["Les **moins qualifiés** se forment le moins, alors qu’ils en auraient le plus besoin : la formation continue peut **accroître** les inégalités.", "Le diplôme ne garantit pas toujours l’emploi : **déclassement** (emploi moins qualifié que son diplôme), inadéquation entre formations et besoins ; dans certains pays, départ des diplômés (« **fuite des cerveaux** »).", "La **quantité** d’années d’études ne suffit pas : la **qualité** des apprentissages compte. Malgré ces limites, l’éducation et la formation restent un **moteur majeur** du développement et de la lutte contre la pauvreté."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : L’éducation et la formation, moteurs du développement et de la lutte contre la pauvreté</h1>
+    <p class="sub">Terminale STMG Économie – 9.2 La réduction de la pauvreté et le rôle de l’éducation et de la formation</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

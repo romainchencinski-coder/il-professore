@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : La régionalisation des échanges : zones d’intégration régionale et accords commerciaux</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Qu’est-ce que la régionalisation des échanges ?",
+  "c": [
+   "La décentralisation des compétences de l’État vers les régions",
+   "La spécialisation d’une région française dans un produit",
+   "La fermeture complète des frontières d’un pays",
+   "L’intensification des échanges entre pays d’une même zone géographique"
+  ],
+  "a": 3,
+  "e": "Souvent appuyée par des accords."
+ },
+ {
+  "q": "Quelle part du commerce des pays de l’UE est intra-régionale ?",
+  "c": [
+   "Environ 15 %",
+   "Environ 60 %",
+   "100 %",
+   "Environ 5 %"
+  ],
+  "a": 1,
+  "e": "Contre environ 15 % en Afrique."
+ },
+ {
+  "q": "Qu’ajoute une union douanière à une zone de libre-échange ?",
+  "c": [
+   "Un tarif extérieur commun",
+   "La suppression des États",
+   "Une monnaie unique",
+   "Un budget fédéral"
+  ],
+  "a": 0,
+  "e": "Ex. : Mercosur."
+ },
+ {
+  "q": "Quel accord a remplacé l’ALENA en 2020 ?",
+  "c": [
+   "Le RCEP (partenariat régional d’Asie-Pacifique)",
+   "Le CETA (accord entre l’UE et le Canada)",
+   "L’ACEUM (accord États-Unis - Mexique - Canada)",
+   "Le Mercosur (marché commun du Sud)"
+  ],
+  "a": 2,
+  "e": "Zone de libre-échange nord-américaine."
+ },
+ {
+  "q": "Depuis quand l’Union européenne est-elle un marché unique ?",
+  "c": [
+   "1993",
+   "1957",
+   "2026",
+   "2002"
+  ],
+  "a": 0,
+  "e": "Libre circulation des biens, services, capitaux et personnes."
+ },
+ {
+  "q": "Quel est le degré d’intégration le plus poussé ?",
+  "c": [
+   "Le marché commun",
+   "La zone de libre-échange",
+   "L’union douanière",
+   "L’union économique et monétaire"
+  ],
+  "a": 3,
+  "e": "Ex. : zone euro."
+ },
+ {
+  "q": "Quel accord commercial est le plus vaste du monde ?",
+  "c": [
+   "L’ACEUM",
+   "Le RCEP (Asie-Pacifique)",
+   "La ZLECAf",
+   "Le CETA"
+  ],
+  "a": 1,
+  "e": "Environ 30 % du PIB mondial."
+ },
+ {
+  "q": "Depuis quand l’accord UE-Mercosur s’applique-t-il à titre provisoire ?",
+  "c": [
+   "Le 17 janvier 2026",
+   "Le 1er janvier 1995",
+   "Le 1er mai 2026",
+   "Il n’a jamais été signé"
+  ],
+  "a": 2,
+  "e": "Signé le 17 janvier 2026."
+ },
+ {
+  "q": "Qu’est-ce que la création de commerce ?",
+  "c": [
+   "Le remplacement d’une production nationale coûteuse par des importations moins chères d’un partenaire",
+   "L’achat à un partenaire moins efficace qu’un pays tiers soumis aux droits de douane",
+   "L’ouverture d’un nouveau marché boursier dans un pays membre",
+   "La création d’une entreprise exportatrice grâce à une subvention publique"
+  ],
+  "a": 0,
+  "e": "Analyse de Jacob Viner (1950)."
+ },
+ {
+  "q": "Quel article du GATT autorise les accords régionaux ?",
+  "c": [
+   "L’article XXIV",
+   "L’article 1240",
+   "L’article 102",
+   "L’article 123"
+  ],
+  "a": 0,
+  "e": "S’ils libéralisent l’essentiel des échanges entre membres."
+ }
+];
+
+const FICHE = "28_la-regionalisation-des-echanges-zones-dintegration-regionale_fiche.pdf";
+const FDATA = {"title": "La régionalisation des échanges : zones d’intégration régionale et accords commerciaux", "blocks": [["h", "Définition", ["La **régionalisation des échanges** désigne l’**intensification des échanges** entre pays d’une même zone géographique. Elle est favorisée par la proximité (coûts de transport faibles, cultures proches) et par des **accords d’intégration régionale** qui réduisent les obstacles aux échanges entre membres.", "Les échanges **intra-régionaux** représentent environ **60 %** du commerce des pays de l’Union européenne, une part élevée aussi en Asie de l’Est, mais seulement environ **15 %** en Afrique. Plus de la moitié des échanges de biens de la France se font avec l’UE."]], ["table", "Les degrés d’intégration régionale (Béla Balassa, 1961)", ["Degré", "Contenu", "Exemples"], [["Zone de libre-échange", "Suppression des **droits de douane** et quotas **entre les membres** ; chacun garde sa politique commerciale envers le reste du monde", "**ACEUM** (accord États-Unis - Mexique - Canada, 2020, qui a remplacé l’ALENA de 1994), **ZLECAf** (zone de libre-échange continentale africaine, 2021)"], ["Union douanière", "Zone de libre-échange + **tarif extérieur commun** face aux pays tiers", "**Mercosur** (1991 : Brésil, Argentine, Uruguay, Paraguay, Bolivie), union douanière imparfaite"], ["Marché commun (marché unique)", "Union douanière + **libre circulation** des capitaux, des personnes et des services", "**Union européenne** : marché unique depuis 1993, 27 pays, environ 450 millions d’habitants"], ["Union économique et monétaire", "Marché unique + **monnaie unique** et coordination des politiques économiques", "**Zone euro** (21 pays en 2026)"]]], ["table", "Les grands accords régionaux et bilatéraux", ["Accord", "Contenu"], [["ASEAN (1967) et **RCEP** (en vigueur en 2022)", "Le partenariat régional économique global réunit 15 pays d’Asie-Pacifique, dont la Chine, le Japon, la Corée du Sud et l’Australie : environ 30 % du PIB mondial, le plus vaste accord commercial au monde"], ["Accords de l’Union européenne", "Avec le Canada (**CETA**, appliqué provisoirement depuis 2017), le Japon (2019), la Corée du Sud, le Vietnam…"], ["**Accord UE-Mercosur**", "Signé le **17 janvier 2026** à Asunción, appliqué **à titre provisoire depuis le 1er mai 2026** : suppression de la plupart des droits de douane entre les deux blocs (plus de 700 millions d’habitants). La **France** et les agriculteurs européens s’y opposent (concurrence agricole, normes environnementales) ; le Parlement européen a saisi la **Cour de justice de l’UE** de sa légalité"]]], ["h", "Les effets de l’intégration régionale", ["**Création de commerce** ([[Jacob Viner|?Jacob_Viner]], 1950) : la suppression des droits de douane entre membres permet de remplacer une production nationale coûteuse par des importations moins chères d’un pays partenaire : gain pour les consommateurs.", "**Détournement de commerce** : un pays membre achète à un partenaire au lieu d’un pays tiers pourtant plus efficace, simplement parce que ce dernier reste soumis aux droits de douane : perte d’efficacité.", "L’intégration élargit les marchés (économies d’échelle), renforce la concurrence et l’attractivité, mais peut provoquer des **restructurations** (secteurs agricoles ou industriels concurrencés) et des tensions sur les **normes**."]], ["h", "Régionalisme et multilatéralisme", ["Les accords régionaux sont autorisés par les règles de l’OMC (article XXIV du GATT) à condition de libéraliser l’essentiel des échanges entre membres. Ils peuvent être une **étape** vers une ouverture plus large (« régionalisme ouvert ») ou au contraire **fragmenter** le commerce mondial en blocs, d’autant plus que les négociations multilatérales de l’OMC sont bloquées."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : La régionalisation des échanges : zones d’intégration régionale et accords commerciaux</h1>
+    <p class="sub">Terminale STMG Économie – 8.1 Les transformations du commerce mondial</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

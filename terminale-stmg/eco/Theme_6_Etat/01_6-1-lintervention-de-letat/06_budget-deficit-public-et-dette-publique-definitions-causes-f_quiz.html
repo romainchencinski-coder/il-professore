@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Budget, déficit public et dette publique : définitions, causes, financement et soutenabilité</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Le déficit public est…",
+  "c": [
+   "Le montant des impôts non payés",
+   "La différence entre exportations et importations",
+   "Un flux : l’excès des dépenses sur les recettes au cours d’une année",
+   "Un stock : l’ensemble des emprunts non remboursés"
+  ],
+  "a": 2,
+  "e": "La dette est le stock."
+ },
+ {
+  "q": "Quelle était la dette publique de la France fin 2025 ?",
+  "c": [
+   "Environ 3 460 Md€, soit 115,6 % du PIB",
+   "Environ 152 Md€, soit 5,1 % du PIB",
+   "Environ 346 Md€, soit 11,6 % du PIB",
+   "Environ 1 714 Md€, soit 57,2 % du PIB"
+  ],
+  "a": 0,
+  "e": "Fin juin 2026 : 3 595,5 Md€, environ 119 %."
+ },
+ {
+  "q": "Quel était le déficit public de la France en 2025 ?",
+  "c": [
+   "0,5 % du PIB",
+   "11,9 % du PIB",
+   "3 % du PIB",
+   "5,1 % du PIB"
+  ],
+  "a": 3,
+  "e": "Contre 5,8 % en 2024."
+ },
+ {
+  "q": "Depuis quand le budget des administrations publiques françaises n’a-t-il plus été en excédent ?",
+  "c": [
+   "1974",
+   "1945",
+   "2008",
+   "1999"
+  ],
+  "a": 0,
+  "e": "Déficits ininterrompus depuis."
+ },
+ {
+  "q": "Qu’est-ce que le solde primaire ?",
+  "c": [
+   "Le solde public hors charges d’intérêts de la dette",
+   "Le solde du commerce extérieur",
+   "Le montant de la dette nette",
+   "Le solde des collectivités locales"
+  ],
+  "a": 0,
+  "e": "Il isole le coût de la dette."
+ },
+ {
+  "q": "En récession, le déficit augmente notamment parce que…",
+  "c": [
+   "Les recettes fiscales baissent et les dépenses sociales augmentent",
+   "Les dépenses de défense disparaissent",
+   "Les impôts augmentent automatiquement",
+   "Les taux d’intérêt deviennent négatifs"
+  ],
+  "a": 0,
+  "e": "Ce sont les stabilisateurs automatiques."
+ },
+ {
+  "q": "Quel organisme émet les titres de la dette de l’État français ?",
+  "c": [
+   "L’Agence France Trésor",
+   "La Banque centrale européenne",
+   "La Cour des comptes",
+   "L’Insee"
+  ],
+  "a": 0,
+  "e": "OAT et BTF."
+ },
+ {
+  "q": "L’effet « boule de neige » apparaît quand…",
+  "c": [
+   "Le taux d’intérêt de la dette dépasse le taux de croissance nominal du PIB",
+   "L’inflation est nulle",
+   "Les impôts augmentent plus vite que le PIB",
+   "Le déficit devient un excédent"
+  ],
+  "a": 0,
+  "e": "Le ratio dette / PIB augmente mécaniquement."
+ },
+ {
+  "q": "Quel objectif de déficit le PLF 2027 fixe-t-il pour 2027 ?",
+  "c": [
+   "5 % du PIB",
+   "3 % du PIB",
+   "7 % du PIB",
+   "0 % du PIB"
+  ],
+  "a": 0,
+  "e": "Contre 5,4 % attendu en 2026."
+ },
+ {
+  "q": "Quel argument relativise le poids de la dette ?",
+  "c": [
+   "Elle finance aussi des investissements utiles aux générations futures",
+   "Elle ne coûte jamais d’intérêts",
+   "Elle est interdite par l’Union européenne",
+   "Elle est remboursée chaque année"
+  ],
+  "a": 0,
+  "e": "Débat sur la « bonne dette »."
+ }
+];
+
+const FICHE = "06_budget-deficit-public-et-dette-publique-definitions-causes-f_fiche.pdf";
+const FDATA = {"title": "Budget, déficit public et dette publique : définitions, causes, financement et soutenabilité", "blocks": [["h", "Les budgets publics", ["Le **budget de l’État** est voté chaque année par le Parlement dans la **loi de finances** : le gouvernement dépose le projet de loi de finances (PLF) à l’automne ; il fixe les **recettes** (impôts, taxes) et les **dépenses** (missions : éducation, défense, justice…). La **loi de financement de la sécurité sociale** (LFSS) encadre les comptes sociaux. Les **collectivités locales** ont aussi leur budget, avec une obligation d’équilibre pour leur fonctionnement (elles ne peuvent emprunter que pour investir).", "Le **PLF 2027**, présenté le 1er octobre 2026 par le gouvernement de [[Sébastien Lecornu|Sébastien_Lecornu]], prévoit un effort d’environ **54 Md€** pour ramener le déficit de **5,4 % du PIB (attendu en 2026) à 5 % en 2027**, avec une hypothèse de croissance de 1 % jugée optimiste par le Haut Conseil des finances publiques."]], ["table", "Déficit et dette : ne pas confondre", ["Notion", "Définition", "Données (Insee)"], [["Solde public", "Recettes publiques - dépenses publiques sur une année ; négatif : **déficit** ; positif : **excédent**", "Les comptes des APU n’ont plus été à l’équilibre ou en excédent depuis **1974**"], ["Déficit public (un **flux**)", "Excès des dépenses sur les recettes **au cours d’une année**", "**5,8 % du PIB** (169,1 Md€) en 2024 ; **5,1 %** (152,5 Md€) en 2025"], ["Dette publique (un **stock**)", "Ensemble des emprunts des APU non encore remboursés à une date donnée (dette brute « au sens de Maastricht »)", "**3 460,5 Md€ (115,6 % du PIB)** fin 2025 ; **3 595,5 Md€ (environ 119 % du PIB)** fin juin 2026, un record depuis l’après-guerre"], ["Solde primaire", "Solde public **hors charges d’intérêts** de la dette", "Indique si l’État dépense plus que ses recettes pour son fonctionnement courant"], ["Solde structurel / conjoncturel", "Le déficit **conjoncturel** est dû à la conjoncture (récession) ; le déficit **structurel** subsiste même en période de croissance normale", "Les règles européennes visent surtout le déficit structurel"]]], ["flow", "Du déficit à la dette", ["Dépenses supérieures aux recettes : déficit de l’année", "L’État emprunte pour le financer", "La dette augmente du montant du déficit", "Des intérêts sont dus chaque année", "Les intérêts alourdissent les dépenses et le déficit suivant"]], ["h", "Pourquoi les déficits ?", ["**Causes conjoncturelles** : en récession, les recettes fiscales baissent (moins de TVA, d’impôt sur les sociétés) et les dépenses sociales augmentent (chômage) : ce sont les **stabilisateurs automatiques**. Les crises creusent fortement le déficit : environ **7 %** du PIB en 2009, environ **9 %** en 2020.", "**Causes structurelles** : dépenses sociales liées au **vieillissement** (retraites, santé, dépendance), baisses d’impôts non compensées, charges d’intérêts croissantes, faible croissance potentielle."]], ["table", "Financer la dette et la rendre soutenable", ["Question", "Réponse"], [["Comment l’État emprunte-t-il ?", "L’**Agence France Trésor** émet des titres sur les marchés financiers : **obligations assimilables du Trésor** (OAT, de 2 à 50 ans) et bons du Trésor (BTF, moins d’un an) ; environ la moitié est détenue par des investisseurs **non résidents**. La BCE ne peut pas prêter directement aux États (article 123 du traité sur le fonctionnement de l’UE)"], ["Qu’est-ce que l’effet « boule de neige » ?", "Quand le **taux d’intérêt** payé sur la dette dépasse le **taux de croissance** du PIB en valeur, le ratio dette / PIB augmente mécaniquement, même sans nouveau déficit primaire"], ["Qui évalue le risque ?", "Les **agences de notation** (S&P, Moody’s, Fitch) ; plusieurs ont abaissé la note de la France en 2024-2025, ce qui peut renchérir les emprunts"], ["Quelles règles ?", "Règles européennes : déficit inférieur à **3 %** et dette inférieure à **60 %** du PIB ; la France fait l’objet d’une **procédure pour déficit excessif** depuis juillet 2024 (voir les politiques budgétaires)"]]], ["h", "Le débat sur la dette", ["**Arguments pour s’inquiéter** : charge d’intérêts qui évince d’autres dépenses (éducation, investissement), transfert du fardeau aux **générations futures**, perte de marges de manœuvre en cas de nouvelle crise, dépendance aux marchés financiers, risque de hausse des taux.", "**Arguments relativisant** : la dette finance aussi des **investissements** utiles à long terme (« bonne dette » : transition écologique, recherche, infrastructures) ; l’État ne meurt pas et refinance sa dette ; la France emprunte dans sa propre monnaie (l’euro) ; la dette a pour contrepartie des **actifs publics**."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Budget, déficit public et dette publique : définitions, causes, financement et soutenabilité</h1>
+    <p class="sub">Terminale STMG Économie – 6.1 L’intervention de l’État</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : De l’État gendarme à l’État-providence : les fonctions économiques de l’État, entre libéralisme et interventionnisme</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Que désigne l’« État » au sens économique ?",
+  "c": [
+   "L’ensemble des administrations publiques (centrales, locales et de sécurité sociale)",
+   "Les seules entreprises publiques détenues majoritairement par l’État",
+   "Le seul gouvernement, avec le Premier ministre et ses ministères",
+   "Le Parlement, c’est-à-dire l’Assemblée nationale et le Sénat réunis"
+  ],
+  "a": 0,
+  "e": "On parle des APU."
+ },
+ {
+  "q": "Quelles sont les fonctions de l’État gendarme ?",
+  "c": [
+   "Les fonctions régaliennes : police, justice, défense, diplomatie",
+   "La production industrielle et la planification",
+   "La redistribution des revenus par l’impôt",
+   "La protection sociale et les retraites"
+  ],
+  "a": 0,
+  "e": "Intervention minimale du XIXe siècle."
+ },
+ {
+  "q": "Quel auteur a développé l’idée de « main invisible » ?",
+  "c": [
+   "John Maynard Keynes",
+   "William Beveridge",
+   "Richard Musgrave",
+   "Adam Smith"
+  ],
+  "a": 3,
+  "e": "La Richesse des nations, 1776."
+ },
+ {
+  "q": "Pour Keynes, pourquoi l’État doit-il intervenir ?",
+  "c": [
+   "Car le marché est toujours efficace",
+   "Car la monnaie doit rester rare",
+   "Car il faut supprimer les entreprises privées",
+   "Car le marché n’assure pas spontanément le plein emploi"
+  ],
+  "a": 3,
+  "e": "Théorie générale, 1936."
+ },
+ {
+  "q": "Quelles sont les trois fonctions de l’État selon Musgrave ?",
+  "c": [
+   "Police, justice, défense",
+   "Planification, nationalisation, protection",
+   "Allocation, redistribution, stabilisation",
+   "Production, consommation, épargne"
+  ],
+  "a": 2,
+  "e": "Classification de 1959."
+ },
+ {
+  "q": "La fonction de stabilisation consiste à…",
+  "c": [
+   "Lisser les fluctuations de l’activité économique",
+   "Fixer les règles de la concurrence",
+   "Réduire les inégalités de revenus",
+   "Produire des biens publics"
+  ],
+  "a": 0,
+  "e": "Soutenir l’activité en récession, la freiner en surchauffe."
+ },
+ {
+  "q": "En quelle année la Sécurité sociale a-t-elle été créée en France ?",
+  "c": [
+   "1936",
+   "1968",
+   "1945",
+   "1958"
+  ],
+  "a": 2,
+  "e": "Ordonnances d’octobre 1945."
+ },
+ {
+  "q": "Quels dirigeants incarnent le tournant libéral des années 1980 ?",
+  "c": [
+   "Jacques Delors et Helmut Kohl",
+   "Charles de Gaulle et Konrad Adenauer",
+   "Franklin Roosevelt et Clement Attlee",
+   "Margaret Thatcher et Ronald Reagan"
+  ],
+  "a": 3,
+  "e": "Privatisations, dérégulation, baisse des impôts."
+ },
+ {
+  "q": "Quelle part du PIB représentent les dépenses publiques en France en 2025 ?",
+  "c": [
+   "75 %",
+   "25 %",
+   "43,6 %",
+   "57,2 %"
+  ],
+  "a": 3,
+  "e": "Insee ; 43,6 % correspond aux prélèvements obligatoires."
+ },
+ {
+  "q": "Pour les libéraux, quel est un risque de l’intervention de l’État ?",
+  "c": [
+   "L’éviction de l’initiative privée et des prélèvements décourageants",
+   "Une baisse excessive des impôts qui ruine les finances publiques",
+   "Une disparition progressive de tous les services publics",
+   "Une hausse automatique des salaires dans le secteur privé"
+  ],
+  "a": 0,
+  "e": "Hayek, Friedman."
+ }
+];
+
+const FICHE = "04_de-letat-gendarme-a-letat-providence-les-fonctions-economiqu_fiche.pdf";
+const FDATA = {"title": "De l’État gendarme à l’État-providence : les fonctions économiques de l’État, entre libéralisme et interventionnisme", "blocks": [["h", "L’État, acteur économique", ["En économie, l’« État » désigne l’ensemble des **administrations publiques** (APU) : les **administrations publiques centrales** (l’État et les organismes qui en dépendent), les **administrations publiques locales** (communes, départements, régions) et les **administrations de sécurité sociale** (régimes de retraite, assurance maladie, assurance chômage).", "Elles produisent des **services non marchands** (éducation, justice, défense, santé publique), fournis gratuitement ou à un prix inférieur à leur coût, et les financent essentiellement par les **prélèvements obligatoires** (impôts et cotisations sociales)."]], ["table", "De l’État gendarme à l’État-providence", ["", "État gendarme (XIXe siècle)", "État-providence (XXe siècle)"], [["Rôle", "Intervention **minimale** : l’État garantit le cadre dans lequel fonctionnent les marchés", "Intervention **étendue** : l’État agit sur l’activité, protège contre les risques sociaux et produit"], ["Fonctions", "**Régaliennes** : police, justice, défense, diplomatie, battre monnaie ; quelques infrastructures (routes, ponts)", "**Régulation** de l’économie, **protection sociale**, **production** de biens et services, redistribution, stabilisation de la conjoncture"], ["Pensée de référence", "**Libéralisme classique** : [[Adam Smith|Adam_Smith]] (*La Richesse des nations*, 1776) et la « main invisible » : la recherche de l’intérêt personnel sur le marché conduit à l’intérêt général", "**[[Keynes|John_Maynard_Keynes]]** (*Théorie générale*, 1936) : le marché n’assure pas spontanément le plein emploi ; **[[Beveridge|William_Beveridge]]** (rapport de 1942) : protéger chacun « du berceau à la tombe »"], ["Exemples en France", "Peu de dépenses publiques (de l’ordre de 10 à 15 % du PIB avant 1914)", "Création de la **Sécurité sociale** (ordonnances d’octobre 1945), nationalisations (1945-1946 : Renault, électricité et gaz, grandes banques), planification (Commissariat général du Plan, 1946)"]]], ["table", "Les fonctions économiques de l’État (Richard Musgrave, 1959, complétées)", ["Fonction", "Objectif", "Exemples"], [["Allocation des ressources", "Produire ou faire produire ce que le marché ne fournit pas ou mal (biens publics, défaillances du marché)", "Éclairage public, défense nationale, recherche fondamentale, infrastructures"], ["Redistribution", "Modifier la répartition primaire des revenus pour **réduire les inégalités** et protéger contre les risques", "Impôt progressif sur le revenu, RSA, allocations familiales, retraites"], ["Stabilisation (régulation conjoncturelle)", "Lisser les **fluctuations** : soutenir l’activité en période de récession, la freiner en cas de surchauffe", "Plan de relance, politique budgétaire, mesures de soutien pendant la crise sanitaire"], ["Réglementation", "Fixer les **règles du jeu** économique et les faire respecter", "Droit de la concurrence, normes de sécurité et environnementales, droit du travail"]]], ["h", "Libéralisme ou interventionnisme : un débat permanent", ["Pour les **libéraux** (Adam Smith, [[Jean-Baptiste Say|Jean-Baptiste_Say]], puis [[Friedrich Hayek|Friedrich_Hayek]] et [[Milton Friedman|Milton_Friedman]] au XXe siècle), le marché est le meilleur mécanisme d’allocation des ressources ; l’intervention de l’État doit rester limitée car elle coûte cher (prélèvements élevés qui découragent le travail et l’investissement), peut être inefficace et peut **évincer** l’initiative privée.", "Pour les **interventionnistes**, dans la lignée de Keynes, les marchés connaissent des **crises** et des **défaillances** (chômage durable, inégalités, pollution) que seul l’État peut corriger ; l’intervention publique est un **complément nécessaire** du marché.", "L’histoire alterne les deux orientations : **keynésianisme** des Trente Glorieuses (1945-1975) ; **tournant libéral** des années 1980 ([[Margaret Thatcher|Margaret_Thatcher]] au Royaume-Uni, [[Ronald Reagan|Ronald_Reagan]] aux États-Unis : privatisations, dérégulation, baisse des impôts) ; **retour de l’État** lors des crises de 2008 (sauvetage des banques, plans de relance) et de 2020 (« quoi qu’il en coûte », chômage partiel massif)."]], ["h", "Un choix de société", ["Le degré d’intervention dépend des **préférences collectives** : un État **interventionniste** prélève une part importante du PIB pour financer une protection sociale étendue et des services publics (pays scandinaves, France) ; un État **libéral** prélève peu et laisse davantage de place aux assurances et services privés (États-Unis, Irlande).", "En France, les **dépenses publiques** atteignent **57,2 % du PIB** et les **prélèvements obligatoires 43,6 % du PIB** en 2025 (Insee), parmi les niveaux les plus élevés des pays de l’OCDE."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : De l’État gendarme à l’État-providence : les fonctions économiques de l’État, entre libéralisme et interventionnisme</h1>
+    <p class="sub">Terminale STMG Économie – 6.1 L’intervention de l’État</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

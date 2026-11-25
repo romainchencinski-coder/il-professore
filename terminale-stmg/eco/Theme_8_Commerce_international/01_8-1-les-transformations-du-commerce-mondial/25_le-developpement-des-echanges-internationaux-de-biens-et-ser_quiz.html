@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Le développement des échanges internationaux de biens et services et la balance commerciale</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Qu’est-ce qu’une exportation ?",
+  "c": [
+   "Une vente de biens ou services d’un agent résident à un agent non résident",
+   "Un investissement dans une usine à l’étranger",
+   "Une vente entre deux entreprises françaises",
+   "Un achat de biens à un pays étranger"
+  ],
+  "a": 0,
+  "e": "L’importation est l’inverse."
+ },
+ {
+  "q": "Quelle innovation de 1956 a fait baisser les coûts du transport maritime ?",
+  "c": [
+   "Le conteneur",
+   "Le télégraphe",
+   "L’avion à réaction",
+   "Le moteur à vapeur"
+  ],
+  "a": 0,
+  "e": "Standardisation du transport."
+ },
+ {
+  "q": "Depuis quand la Chine est-elle membre de l’OMC ?",
+  "c": [
+   "1947",
+   "1995",
+   "2001",
+   "2015"
+  ],
+  "a": 2,
+  "e": "Elle est devenue le premier exportateur mondial de biens."
+ },
+ {
+  "q": "Quelle était la valeur du commerce mondial en 2025 selon la CNUCED ?",
+  "c": [
+   "Plus de 350 000 milliards de dollars",
+   "Environ 350 milliards de dollars",
+   "Environ 3 500 milliards de dollars",
+   "Plus de 35 000 milliards de dollars"
+  ],
+  "a": 3,
+  "e": "Un record."
+ },
+ {
+  "q": "Quels biens ont tiré la croissance du commerce de marchandises au premier semestre 2026 ?",
+  "c": [
+   "Le charbon",
+   "Les produits agricoles",
+   "Les automobiles thermiques",
+   "Les biens liés à l’intelligence artificielle"
+  ],
+  "a": 3,
+  "e": "Semi-conducteurs, serveurs (OMC)."
+ },
+ {
+  "q": "Comment calcule-t-on le solde commercial ?",
+  "c": [
+   "PIB - importations",
+   "Importations / exportations",
+   "Exportations + importations",
+   "Exportations - importations"
+  ],
+  "a": 3,
+  "e": "Positif : excédent ; négatif : déficit."
+ },
+ {
+  "q": "Quel était le solde des échanges de biens de la France en 2025 ?",
+  "c": [
+   "-69,2 Md€",
+   "+69,2 Md€",
+   "0 Md€",
+   "-614,7 Md€"
+  ],
+  "a": 0,
+  "e": "En amélioration de 10 Md€ sur un an."
+ },
+ {
+  "q": "Quel secteur est un point fort des exportations françaises ?",
+  "c": [
+   "L’énergie fossile",
+   "Le textile bas de gamme",
+   "L’aéronautique",
+   "L’électronique grand public"
+  ],
+  "a": 2,
+  "e": "Airbus."
+ },
+ {
+  "q": "La compétitivité hors prix repose sur…",
+  "c": [
+   "Uniquement les salaires bas",
+   "La qualité, l’innovation et l’image de marque",
+   "Les droits de douane",
+   "Uniquement le taux de change"
+  ],
+  "a": 1,
+  "e": "Elle permet de vendre même à un prix élevé."
+ },
+ {
+  "q": "Pourquoi un déficit commercial n’est-il pas toujours un mauvais signe ?",
+  "c": [
+   "Il peut refléter une demande intérieure dynamique",
+   "Car il augmente automatiquement le PIB",
+   "Car il est toujours compensé par l’OMC",
+   "Car il n’a aucun lien avec la compétitivité"
+  ],
+  "a": 0,
+  "e": "Ou la hausse du prix d’importations indispensables."
+ }
+];
+
+const FICHE = "25_le-developpement-des-echanges-internationaux-de-biens-et-ser_fiche.pdf";
+const FDATA = {"title": "Le développement des échanges internationaux de biens et services et la balance commerciale", "blocks": [["h", "Définitions", ["Les **exportations** sont les ventes de biens et de services d’agents résidents à des agents non résidents ; les **importations** sont les achats de biens et services à des non-résidents. Les échanges de **services** comprennent le tourisme, les transports, les services financiers, numériques, d’ingénierie.", "Le **taux d’ouverture** d’une économie rapporte la moyenne de ses exportations et importations à son PIB : il mesure son degré d’insertion dans les échanges."]], ["table", "Les facteurs du développement des échanges", ["Facteur", "Explication et exemples"], [["Baisse des **coûts de transport**", "Invention du **conteneur** (1956), porte-conteneurs géants, avions-cargos : transporter un produit à l’autre bout du monde coûte de moins en moins cher"], ["Révolution des **technologies de l’information et de la communication**", "Internet, outils numériques : on peut coordonner une production éclatée dans plusieurs pays et échanger des services à distance"], ["**Libéralisation** des échanges", "Baisse des droits de douane sous l’égide du **GATT** (1947) puis de l’**OMC** (1995) ; accords régionaux (marché unique européen)"], ["**Économies d’échelle**", "Produire pour le marché mondial permet de réduire le coût unitaire"], ["**Émergence** de nouveaux pays", "Chine (membre de l’OMC en 2001, premier exportateur mondial de biens), Inde, Asie du Sud-Est"], ["Rôle des **firmes multinationales**", "Elles organisent des chaînes de valeur mondiales et une grande partie des échanges (voir les fiches suivantes)"]]], ["table", "Le commerce mondial aujourd’hui", ["Indicateur", "Donnée"], [["Valeur", "Plus de **35 000 milliards de dollars** de biens et services échangés en 2025, un record (CNUCED) ; les biens en représentent environ les trois quarts"], ["Croissance", "L’OMC prévoit une hausse du volume des échanges de marchandises de **3,9 %** en 2026 (prévision d’octobre 2026) : les biens liés à l’**intelligence artificielle** (semi-conducteurs, serveurs) ont représenté près de la moitié de la croissance du premier semestre"], ["Diversification", "Les échanges portent surtout sur les **produits manufacturés** ; les **services** (numérique, tourisme, transport) progressent, mais ont été freinés en 2026 par le conflit au Moyen-Orient"], ["Perturbations", "Guerre commerciale lancée par les États-Unis (2025), perturbations du **détroit d’Ormuz** et des routes maritimes (2026)"]]], ["table", "La balance des biens et des services", ["Notion", "Définition"], [["Balance des biens et services", "Document comptable qui enregistre la **valeur** des exportations et des importations de biens et de services d’un pays sur une période"], ["Solde", "**Exportations - importations** : positif, **excédent** ; négatif, **déficit**"], ["Taux de couverture", "Exportations / importations × 100 : inférieur à 100, les exportations ne couvrent pas les importations"], ["Balance des paiements", "Ensemble plus large qui retrace toutes les opérations avec l’extérieur (biens, services, revenus, flux financiers)"]]], ["table", "Le commerce extérieur de la France en 2025 (douanes)", ["Élément", "Donnée"], [["Exportations de biens", "**614,7 Md€** (+2,5 %), tirées par l’aéronautique, la pharmacie, l’électronique"], ["Solde des échanges de biens", "**-69,2 Md€**, en amélioration de 10 Md€ par rapport à 2024 (baisse de la facture énergétique, livraisons d’avions)"], ["Points forts", "**Aéronautique** (Airbus), **pharmacie** (excédent record), cosmétiques et produits de luxe, boissons ; la France est **excédentaire** dans les échanges de **services** (tourisme, transport maritime)"], ["Points faibles", "**Énergie** importée (pétrole, gaz), biens de consommation, automobile ; l’excédent agroalimentaire est tombé à environ 0,2 Md€, son plus bas niveau depuis au moins 2000"]]], ["h", "Interpréter un solde commercial", ["Un **déficit** peut traduire un manque de **compétitivité** : **compétitivité-prix** (coûts de production, taux de change) ou **hors prix** (qualité, innovation, image de marque, service après-vente). Il reflète aussi la **désindustrialisation** (l’industrie ne représente plus qu’environ 10 % du PIB français) et la dépendance à l’énergie importée.", "Mais un déficit n’est pas toujours un mauvais signe : il peut venir d’une **demande intérieure dynamique** ou d’une hausse du prix des importations indispensables (pétrole en 2022 et en 2026), sans perte de compétitivité."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Le développement des échanges internationaux de biens et services et la balance commerciale</h1>
+    <p class="sub">Terminale STMG Économie – 8.1 Les transformations du commerce mondial</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Agir contre le chômage conjoncturel et le chômage structurel : leviers, contraintes de la zone euro et débats</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quelle politique est adaptée au chômage conjoncturel ?",
+  "c": [
+   "Une hausse des taux directeurs",
+   "Une politique de formation sur dix ans",
+   "Une politique de relance de la demande",
+   "Une baisse durable des allocations chômage"
+  ],
+  "a": 2,
+  "e": "Analyse keynésienne."
+ },
+ {
+  "q": "Pourquoi l’efficacité d’une relance nationale est-elle contestée en économie ouverte ?",
+  "c": [
+   "Parce qu’une partie de la demande supplémentaire profite aux importations",
+   "Parce que la relance est interdite par l’OMC",
+   "Parce que les prix baissent toujours",
+   "Parce que les ménages ne consomment jamais"
+  ],
+  "a": 0,
+  "e": "Contrainte extérieure."
+ },
+ {
+  "q": "Quel est l’objectif premier de la BCE ?",
+  "c": [
+   "Le plein emploi en France",
+   "La hausse des exportations",
+   "La stabilité des prix",
+   "L’équilibre du budget de chaque État"
+  ],
+  "a": 2,
+  "e": "D’où la hausse des taux en 2026 malgré le chômage."
+ },
+ {
+  "q": "Quelle politique répond au chômage structurel ?",
+  "c": [
+   "Une baisse temporaire de la TVA",
+   "La formation et l’amélioration de l’appariement",
+   "Une hausse des dépenses militaires",
+   "Une baisse des taux d’intérêt"
+  ],
+  "a": 1,
+  "e": "Politiques actives."
+ },
+ {
+  "q": "Pour les néoclassiques, comment réduire le chômage ?",
+  "c": [
+   "En relançant la demande par la dette publique",
+   "En augmentant fortement le SMIC",
+   "En fermant les frontières",
+   "En flexibilisant le marché du travail et en baissant le coût du travail"
+  ],
+  "a": 3,
+  "e": "Rigidités et coût du travail."
+ },
+ {
+  "q": "Qu’est-ce qu’une « trappe à bas salaires » ?",
+  "c": [
+   "Un piège fiscal qui fait payer davantage d’impôts aux cadres",
+   "Une situation où l’employeur est dissuadé d’augmenter les salaires pour garder des allègements",
+   "Un emploi bénévole exercé sans aucun salaire",
+   "Une interdiction légale d’augmenter le SMIC plus d’une fois par an"
+  ],
+  "a": 1,
+  "e": "Rapport Bozio-Wasmer, 2024."
+ },
+ {
+  "q": "Quelle mesure de partage du travail a été adoptée en 1998-2000 ?",
+  "c": [
+   "France Travail",
+   "Les 35 heures",
+   "La retraite à 64 ans",
+   "Le CPF"
+  ],
+  "a": 1,
+  "e": "Lois Aubry."
+ },
+ {
+  "q": "Qu’est-ce qu’un effet d’aubaine ?",
+  "c": [
+   "Une baisse des impôts compensée par une hausse des cotisations",
+   "Une aide versée pour une embauche qui aurait eu lieu de toute façon",
+   "Une hausse des salaires décidée par la négociation de branche",
+   "Une embauche qui n’aurait jamais eu lieu sans l’aide publique"
+  ],
+  "a": 1,
+  "e": "Il réduit l’efficacité des aides."
+ },
+ {
+  "q": "Pourquoi les marges de relance budgétaire de la France sont-elles faibles en 2026 ?",
+  "c": [
+   "Parce que la BCE finance directement l’État",
+   "À cause d’une dette élevée et de la procédure pour déficit excessif",
+   "Parce que la France a un excédent budgétaire",
+   "Parce que les impôts sont nuls"
+  ],
+  "a": 1,
+  "e": "Dette proche de 119 % du PIB."
+ },
+ {
+  "q": "Que faut-il mesurer pour évaluer une politique de l’emploi ?",
+  "c": [
+   "Uniquement le nombre de bénéficiaires inscrits dans le dispositif",
+   "Uniquement le montant total dépensé par l’État chaque année",
+   "Le nombre d’articles de presse consacrés au dispositif",
+   "Le coût par emploi réellement créé, en tenant compte des effets d’aubaine"
+  ],
+  "a": 3,
+  "e": "Évaluation des politiques publiques."
+ }
+];
+
+const FICHE = "24_agir-contre-le-chomage-conjoncturel-et-le-chomage-structurel_fiche.pdf";
+const FDATA = {"title": "Agir contre le chômage conjoncturel et le chômage structurel : leviers, contraintes de la zone euro et débats", "blocks": [["table", "À chaque forme de chômage, ses remèdes", ["Forme de chômage", "Politique adaptée", "Exemples"], [["**Conjoncturel** (keynésien)", "**Relance** de la demande : politique **budgétaire** (dépenses publiques, baisses d’impôts) et politique **monétaire accommodante** (baisse des taux)", "Plans de relance de 2009 et de 2020 ; chômage partiel massif en 2020 pour préserver les emplois"], ["**Structurel**", "Politiques **actives** : formation, accompagnement, mobilité, réformes du marché du travail, baisse du coût du travail peu qualifié", "CPF, apprentissage, France Travail, allègements de cotisations"], ["**Frictionnel**", "Améliorer l’**information** et l’**appariement**", "Plateformes d’offres d’emploi, accompagnement des demandeurs"], ["**Volontaire** (analyse néoclassique)", "Renforcer les **incitations** à reprendre un emploi", "Prime d’activité, règles d’indemnisation plus strictes, contrôle de la recherche d’emploi"]]], ["h", "Les contraintes de la relance dans la zone euro", ["**Ouverture des économies** : une relance nationale profite en partie aux producteurs étrangers par les importations ; son efficacité est donc **contestée** pour une économie très ouverte comme la France.", "**Politique monétaire commune** : elle relève de la **BCE**, dont l’objectif premier est la **stabilité des prix** et non l’emploi. En 2026, malgré la remontée du chômage, la BCE a **relevé** ses taux (taux de dépôt de 2 % à 2,50 %) pour contenir l’inflation due au choc énergétique.", "**Politique budgétaire surveillée** : règles européennes (3 % de déficit, 60 % de dette), procédure pour déficit excessif contre la France depuis 2024, dette publique proche de 119 % du PIB : les marges de relance sont **faibles**."]], ["table", "Un débat entre économistes", ["", "Analyse keynésienne", "Analyse néoclassique (libérale)"], [["Cause principale du chômage", "Insuffisance de la **demande** anticipée", "**Rigidités** du marché du travail, coût du travail trop élevé, incitations insuffisantes"], ["Remède prioritaire", "**Soutenir la demande** (relance, hausse des revenus)", "**Flexibiliser** le marché du travail, baisser le coût du travail, inciter à la reprise d’emploi"], ["Regard sur le salaire", "Un revenu qui soutient la consommation", "Un coût qui pèse sur l’embauche"]]], ["h", "Évaluer les politiques de l’emploi", ["Les **allègements de cotisations** sur les bas salaires coûtent plusieurs dizaines de milliards d’euros par an : ils ont favorisé l’emploi peu qualifié, mais un rapport de 2024 ([[Antoine Bozio|?Antoine_Bozio]] et [[Étienne Wasmer|?Étienne_Wasmer]]) a montré qu’ils pouvaient enfermer des salariés dans des **« trappes à bas salaires »** (l’employeur perd des allègements s’il augmente les salaires) : d’où la réforme de 2026, plus progressive.", "Les aides à l’**apprentissage** ont fortement augmenté le nombre d’apprentis, surtout dans l’enseignement supérieur, pour un coût élevé ; leur effet sur l’emploi des jeunes les moins qualifiés est débattu.", "Le **partage du travail** (35 heures, 1998-2000) a eu des effets discutés : créations d’emplois selon ses défenseurs, coût pour les entreprises et l’État selon ses critiques.", "Dans tous les cas, il faut repérer les **effets d’aubaine**, les **effets de substitution** (une aide à un public peut évincer un autre public) et comparer le **coût par emploi créé**."]], ["h", "La situation en 2026", ["Avec une croissance quasi nulle, un chômage remonté à **8,2 %** et peu de marges budgétaires, la France combine des mesures **structurelles** (formation, accompagnement par France Travail, réformes de l’assurance chômage, RSA conditionné) et la recherche d’économies budgétaires. L’objectif de **plein emploi** (environ 5 % de chômage) semble s’éloigner."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Agir contre le chômage conjoncturel et le chômage structurel : leviers, contraintes de la zone euro et débats</h1>
+    <p class="sub">Terminale STMG Économie – 7.3 Les politiques de l’emploi</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>

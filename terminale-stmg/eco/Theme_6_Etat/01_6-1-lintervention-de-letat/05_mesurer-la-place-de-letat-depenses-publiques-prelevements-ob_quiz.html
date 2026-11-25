@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz : Mesurer la place de l’État : dépenses publiques, prélèvements obligatoires, emploi public et entreprises publiques</title>
+<style>
+  :root { --blue:#1f3a5f; --light:#e8eef6; --ok:#2e7d32; --ko:#c62828; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#f4f6fa; margin:0; padding:20px; color:#222; }
+  main { max-width:680px; margin:0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  h1 { color:var(--blue); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#666; margin:0 0 18px; }
+  .bar { height:8px; background:var(--light); border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .bar div { height:100%; background:var(--blue); width:0; transition:width .3s; }
+  .count { font-size:.9rem; color:#666; margin-bottom:6px; }
+  .question { font-size:1.1rem; font-weight:600; margin:0 0 14px; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border:2px solid var(--light); background:#fff; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .choice:hover:enabled { border-color:var(--blue); }
+  .choice.correct { border-color:var(--ok); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--ko); background:#ffebee; }
+  .explain { margin-top:14px; padding:12px; background:var(--light); border-radius:8px; display:none; }
+  button.main { margin-top:16px; background:var(--blue); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:1rem; cursor:pointer; }
+  .score { font-size:2.2rem; color:var(--blue); font-weight:700; }
+  a.fiche { display:inline-block; margin-top:10px; color:var(--blue); font-weight:600; }
+  ul.recap { padding-left:18px; }
+  ul.recap li { margin:6px 0; }
+  a.lk { color:var(--blue); font-weight:600; font-size:.92rem; }
+  .backq { position:sticky; top:0; z-index:5; background:var(--blue); color:#fff; padding:10px 14px; border-radius:8px; margin:-8px -8px 14px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  .backq button { background:#fff; color:var(--blue); border:0; border-radius:6px; padding:8px 12px; font-weight:700; font-size:1rem; cursor:pointer; }
+  .fic h2 { color:var(--blue); font-size:1.25rem; }
+  .fic h3 { color:var(--blue); margin:18px 0 6px; font-size:1.05rem; padding:2px 4px; }
+  .fic ul { padding-left:20px; margin:6px 0; }
+  .fic li { margin:5px 0; line-height:1.45; }
+  .fic table { border-collapse:collapse; width:100%; font-size:.93rem; }
+  .fic td, .fic th { border:1px solid #c9d3e3; padding:6px; vertical-align:top; text-align:left; }
+  .fic th { background:var(--light); }
+  .tw { overflow-x:auto; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; background:var(--light); border:1px solid var(--blue); border-radius:8px; padding:10px; }
+  .flow > div { flex:1 1 120px; text-align:center; font-weight:700; color:var(--blue); }
+  .flow > span { align-self:center; color:var(--blue); font-weight:700; }
+  .fic h3 { scroll-margin-top:70px; }
+  .goto { background:#fff3cd; box-shadow:0 0 0 3px #f2c94c; border-radius:6px; }
+  a.wiki { color:var(--blue); text-decoration:underline dotted; font-weight:600; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+const QUESTIONS = [
+ {
+  "q": "Quel indicateur rapporte les impôts et cotisations sociales perçus au PIB ?",
+  "c": [
+   "Le taux d’épargne",
+   "Le taux de dépenses publiques",
+   "Le taux de prélèvements obligatoires",
+   "Le déficit public"
+  ],
+  "a": 2,
+  "e": "43,6 % en 2025."
+ },
+ {
+  "q": "Quel était le taux de prélèvements obligatoires en France en 2025 ?",
+  "c": [
+   "57,2 %",
+   "43,6 %",
+   "33,3 %",
+   "52,1 %"
+  ],
+  "a": 1,
+  "e": "57,2 % = dépenses ; 52,1 % = recettes publiques."
+ },
+ {
+  "q": "Quelle catégorie de dépenses comprend les retraites et les allocations familiales ?",
+  "c": [
+   "Les dépenses de fonctionnement",
+   "Les dépenses d’investissement",
+   "Les dépenses de transfert",
+   "Les charges d’intérêts"
+  ],
+  "a": 2,
+  "e": "Ce sont des prestations sociales."
+ },
+ {
+  "q": "Combien de personnes travaillent environ dans la fonction publique en France ?",
+  "c": [
+   "Environ 1 million",
+   "Environ 15 millions",
+   "Environ 5,8 millions",
+   "Environ 500 000"
+  ],
+  "a": 2,
+  "e": "Environ un emploi sur cinq."
+ },
+ {
+  "q": "Une entreprise dont l’État détient la majorité du capital est…",
+  "c": [
+   "Une entreprise privée subventionnée",
+   "Une association reconnue d’utilité publique",
+   "Une entreprise publique",
+   "Une entreprise semi-publique"
+  ],
+  "a": 2,
+  "e": "Ex. : EDF, détenue à 100 % depuis 2023."
+ },
+ {
+  "q": "Dans une entreprise semi-publique, l’État est…",
+  "c": [
+   "Le seul client",
+   "Le seul actionnaire",
+   "Absent du capital",
+   "Un actionnaire minoritaire mais influent"
+  ],
+  "a": 3,
+  "e": "Ex. : Orange, Renault, Airbus."
+ },
+ {
+  "q": "Qu’est-ce qu’une privatisation ?",
+  "c": [
+   "Le rachat par l’État d’une entreprise privée",
+   "La création d’une entreprise individuelle",
+   "La suppression d’un service public",
+   "La vente au secteur privé d’une entreprise publique"
+  ],
+  "a": 3,
+  "e": "Ex. : Française des jeux en 2019."
+ },
+ {
+  "q": "Pourquoi certains réseaux sont-ils des monopoles naturels ?",
+  "c": [
+   "Parce qu’ils n’ont pas de coûts fixes",
+   "Parce que la loi interdit toute concurrence",
+   "Parce qu’ils sont gratuits",
+   "Parce qu’un réseau unique coûte moins cher que plusieurs réseaux concurrents"
+  ],
+  "a": 3,
+  "e": "Rails, lignes électriques."
+ },
+ {
+  "q": "Quel secteur a été ouvert à la concurrence en France en 1998 ?",
+  "c": [
+   "Les télécommunications",
+   "La défense nationale",
+   "Le transport ferroviaire de voyageurs",
+   "La justice"
+  ],
+  "a": 0,
+  "e": "Fin du monopole de France Télécom."
+ },
+ {
+  "q": "À combien s’élevaient les charges d’intérêts de la dette publique en 2025 ?",
+  "c": [
+   "6,5 Md€",
+   "64,7 Md€",
+   "1 714 Md€",
+   "647 Md€"
+  ],
+  "a": 1,
+  "e": "En hausse de 11,2 % en un an (Insee)."
+ }
+];
+
+const FICHE = "05_mesurer-la-place-de-letat-depenses-publiques-prelevements-ob_fiche.pdf";
+const FDATA = {"title": "Mesurer la place de l’État : dépenses publiques, prélèvements obligatoires, emploi public et entreprises publiques", "blocks": [["table", "Les indicateurs de la place de l’État (France, Insee)", ["Indicateur", "Définition", "Niveau"], [["Dépenses publiques", "Ensemble des dépenses des APU (État, collectivités locales, sécurité sociale)", "**1 714,1 Md€**, soit **57,2 % du PIB** en 2025 (57,0 % en 2024)"], ["Recettes publiques", "Prélèvements obligatoires et autres recettes (revenus de la propriété, ventes)", "**1 561,6 Md€**, soit **52,1 % du PIB** en 2025"], ["Taux de prélèvements obligatoires", "Impôts et cotisations sociales effectivement perçus / PIB × 100", "**43,6 %** en 2025 (42,8 % en 2024)"], ["Charges d’intérêts de la dette", "Intérêts versés aux prêteurs des APU", "**64,7 Md€** en 2025 (+11,2 % en un an)"], ["Emploi public", "Agents des trois fonctions publiques (de l’État, territoriale, hospitalière)", "Environ **5,8 millions** de personnes, soit environ **un emploi sur cinq**"]]], ["table", "Les grandes catégories de dépenses publiques", ["Catégorie", "Exemples"], [["Dépenses de fonctionnement", "Rémunération des agents publics (enseignants, soignants, policiers), achats courants"], ["Dépenses d’investissement", "Écoles, hôpitaux, routes, réseaux ferrés, équipements militaires, transition énergétique"], ["Dépenses de transfert (redistribution)", "**Prestations sociales** (retraites, remboursements de soins, allocations familiales, chômage, RSA) et subventions aux entreprises ; la **protection sociale** (au sens large, santé comprise) représente plus de la moitié des dépenses publiques"], ["Charges d’intérêts", "Coût de la dette publique, en forte hausse depuis la remontée des taux d’intérêt (2022-2023 puis 2026)"]]], ["table", "L’État et les entreprises", ["Type d’entreprise", "Définition", "Exemples"], [["Entreprise publique", "L’État (ou une collectivité) détient **la majorité du capital** ou exerce une **influence dominante**", "**EDF** (détenue à 100 % depuis 2023), **SNCF** (société anonyme à capitaux publics depuis 2020), **La Poste**, **RATP** (établissement public)"], ["Entreprise semi-publique (d’économie mixte)", "Capitaux **publics et privés** : l’État est un actionnaire **minoritaire** mais influent", "Orange (environ 23 % avec Bpifrance), Renault (15 %), Airbus (environ 11 %) ; sociétés d’économie mixte locales (transports urbains, aménagement)"], ["Entreprise privée", "Capital entièrement détenu par des personnes privées", "L’État peut l’aider (subventions, garanties) ou la réglementer, sans la posséder"], ["Outils de l’État actionnaire", "**Agence des participations de l’État** (APE, 2004) ; **Bpifrance** (banque publique d’investissement, 2012) ; la Caisse des dépôts", "Prises de participation dans des entreprises jugées **stratégiques** (énergie, défense, nucléaire, transport)"]]], ["h", "Nationalisations, privatisations et ouverture à la concurrence", ["**Nationaliser**, c’est transférer la propriété d’une entreprise privée à l’État (1945-1946 ; 1982 : grands groupes industriels et 39 banques). **Privatiser**, c’est l’inverse (1986-1988, 1993-1997, autoroutes en 2006, Française des jeux en 2019).", "Certaines activités sont des **monopoles naturels** : un réseau unique (rails, lignes électriques) est moins coûteux que plusieurs réseaux concurrents ; ils restent souvent publics (SNCF Réseau, RTE).", "Sous l’impulsion de l’**Union européenne**, d’anciens monopoles publics ont été **ouverts à la concurrence** : **télécommunications** (1998), électricité et gaz (totalement en 2007), transport ferroviaire de voyageurs (TGV à partir de décembre 2020, TER par appels d’offres des régions), bus de la RATP en Île-de-France (progressivement depuis 2025). Objectif : baisser les prix et améliorer le service ; débat : maintien des missions de **service public** (continuité, égalité d’accès sur tout le territoire).", "La crise énergétique et les enjeux de **souveraineté** ont relancé l’**État actionnaire et stratège** : renationalisation complète d’EDF (2023), plan **France 2030** (54 Md€ d’investissements, 2021) dans l’énergie, l’industrie, la santé et le numérique."]]]};
+const app = document.getElementById("app");
+let order, idx, score, answers;
+
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle(QUESTIONS.map((_, i) => i));
+  idx = 0; score = 0; answers = [];
+  render();
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const STOP = new Set("dans pour avec sont cette cela ainsi leur leurs mais donc plus aussi entre sans comme tout tous toute toutes dont elle elles nous vous être avoir fait faire peut peuvent selon chez très alors après avant depuis encore même autre autres quand quel quelle ces ses son sur par une des les aux est ont qui que".split(" "));
+function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[*_]|<\/?[a-z]+>|\[\[|\]\]|\|[A-Za-z_.À-ſ()'-]+(?=\]\])/g, " "); }
+function md(s) {
+  const links = [];
+  s = String(s).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, t, w) => { links.push([t, w]); return "\u0001" + (links.length - 1) + "\u0002"; });
+  return esc(s)
+    .replace(/&lt;sub&gt;/g, "<sub>").replace(/&lt;\/sub&gt;/g, "</sub>")
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>")
+    .replace(/\u0001(\d+)\u0002/g, (m, i) => '<a class="wiki" href="https://fr.wikipedia.org/wiki/' +
+      encodeURIComponent(links[+i][1].replace(/ /g, "_")) + '" target="_blank" rel="noopener">' + esc(links[+i][0]) + "</a>");
+}
+function blockText(b) {
+  return b[0] === "table" ? b[1] + " " + b[2].join(" ") + " " + b[3].map(r => r.join(" ")).join(" ") : b[1] + " " + b[2].join(" ");
+}
+function matchBlock(Q) {
+  if (!FDATA) return -1;
+  const words = Array.from(new Set(norm(Q.q + " " + Q.c[Q.a] + " " + Q.e).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOP.has(w))));
+  let best = 0, bs = -1;
+  FDATA.blocks.forEach((b, bi) => {
+    const t = " " + norm(blockText(b)).replace(/[^a-z0-9]+/g, " ") + " ";
+    let sc = 0;
+    words.forEach(w => { if (t.includes(" " + w)) sc += w.length > 6 ? 2 : 1; });
+    if (sc > bs) { bs = sc; best = bi; }
+  });
+  return best;
+}
+function blockHtml(b) {
+  if (b[0] === "h") return "<h3>" + md(b[1]) + "</h3><ul>" + b[2].map(x => "<li>" + md(x) + "</li>").join("") + "</ul>";
+  if (b[0] === "flow") return "<h3>" + md(b[1]) + '</h3><div class="flow">' + b[2].map((x, i) => (i ? "<span>›</span>" : "") + "<div>" + md(x) + "</div>").join("") + "</div>";
+  if (b[0] === "table") return "<h3>" + md(b[1]) + '</h3><div class="tw"><table><tr>' + b[2].map(x => "<th>" + md(x) + "</th>").join("") + "</tr>" +
+    b[3].map(r => "<tr>" + r.map((x, i) => i ? "<td>" + md(x) + "</td>" : "<td><b>" + md(x) + "</b></td>").join("") + "</tr>").join("") + "</table></div>";
+  return "";
+}
+function ficheLink(bi, label) {
+  if (!FDATA) return `<a class="fiche" href="${FICHE}" target="_blank" rel="noopener">${label} (PDF)</a>`;
+  return `<a class="fiche" href="#fiche" data-b="${bi}">${label}</a>`;
+}
+let saved = null; // contenu du quiz mis de côté pendant la lecture de la fiche
+function showFiche(bi, where) {
+  saved = { html: app.innerHTML, y: window.scrollY, where };
+  app.innerHTML = `<div class="backq"><button id="backq">← Retour ${where}</button></div>
+    <div class="fic"><h2>${md(FDATA.title)}</h2>${FDATA.blocks.map(blockHtml).join("")}</div>
+    <p><a class="lk" href="${FICHE}" target="_blank" rel="noopener">Version PDF imprimable de la fiche</a></p>
+    <button class="main" id="backq2">← Retour ${where}</button>`;
+  const hs = app.querySelectorAll(".fic > h3");
+  if (bi >= 0 && hs[bi]) {
+    hs[bi].classList.add("goto"); const n = hs[bi].nextElementSibling; if (n) n.classList.add("goto");
+    setTimeout(() => hs[bi].scrollIntoView({ block: "start" }), 30);
+  } else window.scrollTo(0, 0);
+  try { history.pushState({ fiche: 1 }, "", "#fiche"); } catch (e) {}
+  app.querySelector("#backq").addEventListener("click", backToQuiz);
+  app.querySelector("#backq2").addEventListener("click", backToQuiz);
+}
+function backToQuiz() {
+  if (!saved) return;
+  const s = saved; saved = null;
+  app.innerHTML = s.html; rebind();
+  window.scrollTo(0, s.y);
+  if (location.hash === "#fiche") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+window.addEventListener("popstate", () => { if (saved) backToQuiz(); });
+app.addEventListener("click", ev => {
+  const a = ev.target.closest("a.fiche[data-b]");
+  if (!a) return;
+  ev.preventDefault();
+  showFiche(+a.dataset.b, a.dataset.w || (idx >= order.length ? "aux résultats" : `au quiz (question ${idx + 1}/${order.length})`));
+});
+// Après retour, on rebranche les boutons de la vue restaurée
+function rebind() {
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", () => { idx++; render(); });
+  const again = document.getElementById("again");
+  if (again) again.addEventListener("click", start);
+  document.querySelectorAll(".choice:enabled").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function render() {
+  if (idx >= order.length) return showResult();
+  const Q = QUESTIONS[order[idx]];
+  const pct = Math.round(idx / order.length * 100);
+  app.innerHTML = `
+    <h1>Quiz : Mesurer la place de l’État : dépenses publiques, prélèvements obligatoires, emploi public et entreprises publiques</h1>
+    <p class="sub">Terminale STMG Économie – 6.1 L’intervention de l’État</p>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="count">Question ${idx + 1} / ${order.length}</div>
+    <p class="question">${esc(Q.q)}</p>
+    <div id="choices">
+      ${Q.c.map((t, i) => `<button class="choice" data-i="${i}">${esc(t)}</button>`).join("")}
+    </div>
+    <div class="explain" id="explain"></div>
+    <button class="main" id="next" style="display:none"></button>`;
+  document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", () => answer(+b.dataset.i)));
+}
+
+function answer(i) {
+  const Q = QUESTIONS[order[idx]];
+  const ok = i === Q.a;
+  if (ok) score++;
+  answers.push({ q: Q.q, ok, good: Q.c[Q.a], b: matchBlock(Q) });
+  document.querySelectorAll(".choice").forEach((b, k) => {
+    b.disabled = true;
+    if (k === Q.a) b.classList.add("correct");
+    else if (k === i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("explain");
+  ex.style.display = "block";
+  ex.innerHTML = `<strong>${ok ? "Bonne réponse !" : "Raté."}</strong> ${md(Q.e)}<br>${ficheLink(matchBlock(Q), "📖 Revoir ce point dans la fiche")}`;
+  const next = document.getElementById("next");
+  next.style.display = "inline-block";
+  next.textContent = idx + 1 < order.length ? "Question suivante" : "Voir mon score";
+  next.addEventListener("click", () => { idx++; render(); });
+}
+
+function showResult() {
+  const n = order.length;
+  const msg = score >= n * 0.8 ? "Excellent, le cours est maîtrisé !"
+            : score >= n * 0.5 ? "Pas mal, relis les points manqués."
+            : "À retravailler : reprends la fiche et réessaie.";
+  const missed = answers.filter(a => !a.ok);
+  app.innerHTML = `
+    <h1>Résultat</h1>
+    <div class="bar"><div style="width:100%"></div></div>
+    <p class="score">${score} / ${n}</p>
+    <p>${msg}</p>
+    ${missed.length ? `<h3>À revoir</h3><ul class="recap">${missed.map(a =>
+      `<li>${esc(a.q)}<br><em>Réponse : ${esc(a.good)}</em><br>${ficheLink(a.b, "📖 Voir dans la fiche")}</li>`).join("")}</ul>` : ""}
+    ${ficheLink(-1, "📖 Relire toute la fiche")}<br><button class="main" id="again">Recommencer</button>`;
+  document.getElementById("again").addEventListener("click", start);
+}
+
+start();
+</script>
+</body>
+</html>
